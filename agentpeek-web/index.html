@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0a12" />
+    <title>AgentPeek — Stop your AI agents from stepping on each other</title>
+    <meta name="description" content="A native macOS daemon with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts." />
+
+    <!-- Open Graph -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:title"       content="AgentPeek — Stop your AI agents from stepping on each other" />
+    <meta property="og:description" content="A native macOS daemon with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts." />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:title"       content="AgentPeek — Stop your AI agents from stepping on each other" />
+    <meta name="twitter:description" content="A native macOS daemon with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+
+    <div class="bg-orbs" aria-hidden="true">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+
+    <!-- ── Fold 1: Hero ──────────────────────────────────────── -->
+    <section class="fold1" id="top">
+      <div class="fold1-inner">
+
+        <div class="hero">
+          <span class="hero-badge">AI Agent Coordination</span>
+          <h1>
+            Your agents are stepping on each other.
+            <span class="hero-accent">AgentPeek fixes that.</span>
+          </h1>
+          <p class="tagline">A native macOS daemon with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts.</p>
+        </div>
+
+        <!-- Install command -->
+        <div class="install-cmd-wrap">
+          <code id="hero-install-cmd">brew install agentpeek</code>
+          <button class="copy-btn" data-copy="hero-install-cmd" aria-label="Copy install command">Copy</button>
+        </div>
+
+        <!-- Terminal mockup -->
+        <div class="terminal-pair" aria-hidden="true">
+
+          <!-- Agent A -->
+          <div class="terminal-card">
+            <div class="terminal-titlebar">
+              <div class="terminal-dots">
+                <span class="terminal-dot terminal-dot--red"></span>
+                <span class="terminal-dot terminal-dot--yellow"></span>
+                <span class="terminal-dot terminal-dot--green"></span>
+              </div>
+              <span class="terminal-title">Claude Code — Session A</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="t-prompt">&gt;</span> <span class="t-cmd">lock_resource("npm-install", ...)</span></div>
+              <div><span class="t-ok">✓</span> <span class="t-key">locked:</span> <span class="t-val">true</span></div>
+              <div><span class="t-prompt">&gt;</span> <span class="t-cmd">npm install</span></div>
+              <div><span class="t-dim">&nbsp;&nbsp;installing...</span></div>
+            </div>
+          </div>
+
+          <!-- Agent B -->
+          <div class="terminal-card">
+            <div class="terminal-titlebar">
+              <div class="terminal-dots">
+                <span class="terminal-dot terminal-dot--red"></span>
+                <span class="terminal-dot terminal-dot--yellow"></span>
+                <span class="terminal-dot terminal-dot--green"></span>
+              </div>
+              <span class="terminal-title">Claude Code — Session B</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="t-prompt">&gt;</span> <span class="t-cmd">lock_resource("npm-install", ...)</span></div>
+              <div><span class="t-fail">✗</span> <span class="t-key">locked:</span> <span class="t-val">false</span></div>
+              <div><span class="t-dim">&nbsp;&nbsp;held_by: "session-A"</span></div>
+              <div><span class="t-prompt">&gt;</span> <span class="t-dim">(waiting...)</span></div>
+            </div>
+          </div>
+
+        </div><!-- /terminal-pair -->
+
+        <p class="compat-strip">Works with Claude · Cursor · Copilot · Cline · Windsurf · any MCP-compatible agent</p>
+
+      </div>
+
+      <a class="scroll-indicator" href="#tools" aria-label="Jump to MCP tools">
+        See the 7 MCP tools <span class="scroll-arrow" aria-hidden="true">↓</span>
+      </a>
+    </section>
+
+    <!-- ── Fold 2: Tools ──────────────────────────────────────── -->
+    <section class="fold2" id="tools">
+      <div class="fold2-inner">
+
+        <div class="fold2-header">
+          <span class="fold2-label">7 MCP Tools</span>
+          <h2 class="fold2-headline">Everything agents need to coordinate.</h2>
+          <p class="fold2-sub">All tools available on <code style="font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(167,139,250,0.8)">127.0.0.1:27183</code> — any MCP-compatible agent, one shared daemon.</p>
+        </div>
+
+        <!-- Tool groups -->
+        <div class="tool-groups" role="list" aria-label="Available MCP tools">
+
+          <div class="tool-group" role="listitem">
+            <span class="tool-group-label">Locks</span>
+            <div class="tool-pills">
+              <span class="tool-pill">lock_resource</span>
+              <span class="tool-pill">unlock_resource</span>
+              <span class="tool-pill">renew_lock</span>
+              <span class="tool-pill">list_locks</span>
+            </div>
+          </div>
+
+          <div class="tool-group" role="listitem">
+            <span class="tool-group-label">Scratchpad</span>
+            <div class="tool-pills">
+              <span class="tool-pill">set_note</span>
+              <span class="tool-pill">get_note</span>
+              <span class="tool-pill">list_notes</span>
+            </div>
+          </div>
+
+        </div><!-- /tool-groups -->
+
+        <!-- Install steps -->
+        <div class="setup-steps">
+
+          <!-- Step 1 -->
+          <div class="step-card">
+            <div class="step-card-header">
+              <div class="step-num" aria-hidden="true">1</div>
+              <p class="step-title">Build &amp; install</p>
+            </div>
+            <p class="step-desc">Compile from source and place the binary on your PATH.</p>
+            <div class="config-row">
+              <code id="step1-cmd">swift build -c release &amp;&amp; sudo cp .build/release/agentpeek /usr/local/bin/</code>
+              <button class="copy-btn" data-copy="step1-cmd" aria-label="Copy build command">Copy</button>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="step-card">
+            <div class="step-card-header">
+              <div class="step-num" aria-hidden="true">2</div>
+              <p class="step-title">Load daemon</p>
+            </div>
+            <p class="step-desc">Register with launchd so AgentPeek starts automatically at login.</p>
+            <div class="config-row">
+              <code id="step2-cmd">cp com.agentpeek.daemon.plist ~/Library/LaunchAgents/ &amp;&amp; launchctl load ~/Library/LaunchAgents/com.agentpeek.daemon.plist</code>
+              <button class="copy-btn" data-copy="step2-cmd" aria-label="Copy launchd command">Copy</button>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="step-card">
+            <div class="step-card-header">
+              <div class="step-num" aria-hidden="true">3</div>
+              <p class="step-title">Configure agent</p>
+            </div>
+            <p class="step-desc">Add to <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:4px">~/.claude/mcp_servers.json</code></p>
+            <div class="config-row">
+              <pre id="step3-cmd">{"agentpeek": {"transport": "http", "url": "http://127.0.0.1:27183"}}</pre>
+              <button class="copy-btn" data-copy="step3-cmd" aria-label="Copy MCP config JSON">Copy</button>
+            </div>
+          </div>
+
+        </div><!-- /setup-steps -->
+
+      </div>
+
+      <a class="scroll-indicator" href="#compare" aria-label="Jump to comparison">
+        How does it compare? <span class="scroll-arrow" aria-hidden="true">↓</span>
+      </a>
+    </section>
+
+    <!-- ── Fold 3: Comparison ──────────────────────────────────── -->
+    <section class="fold3" id="compare">
+      <div class="fold3-inner">
+
+        <div class="fold3-header">
+          <span class="fold3-label">Why AgentPeek</span>
+          <h2 class="fold3-headline">Three approaches.<br><span class="fold3-headline-accent">One that actually works.</span></h2>
+          <p class="fold3-sub">How do your agents coordinate shared resources when they all run at once?</p>
+        </div>
+
+        <div class="compare-grid">
+
+          <!-- Shell workarounds -->
+          <div class="compare-card">
+            <div class="compare-card-icon compare-card-icon--gray">🖥️</div>
+            <div class="compare-card-title">Shell Workarounds</div>
+            <div class="compare-card-subtitle">lockfiles · flock · manual scripts</div>
+            <ul class="compare-rows">
+              <li class="compare-row compare-row--no">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Resource locking</span><span class="compare-row-val">No atomic, named locks</span></span>
+              </li>
+              <li class="compare-row compare-row--no">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Shared state</span><span class="compare-row-val">No key-value notes</span></span>
+              </li>
+              <li class="compare-row compare-row--no">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Persists across restarts</span><span class="compare-row-val">No</span></span>
+              </li>
+              <li class="compare-row compare-row--no">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Multi-agent safe</span><span class="compare-row-val">No — race conditions</span></span>
+              </li>
+              <li class="compare-row compare-row--no">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Runs as daemon</span><span class="compare-row-val">No</span></span>
+              </li>
+              <li class="compare-row compare-row--no">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Works across tools</span><span class="compare-row-val">No</span></span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Session-scoped skills -->
+          <div class="compare-card">
+            <div class="compare-card-icon compare-card-icon--blue">⚡</div>
+            <div class="compare-card-title">Session-Scoped Skills</div>
+            <div class="compare-card-subtitle">claude code skills · one session</div>
+            <ul class="compare-rows">
+              <li class="compare-row compare-row--no">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Resource locking</span><span class="compare-row-val">No cross-session locking</span></span>
+              </li>
+              <li class="compare-row compare-row--no">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Shared state</span><span class="compare-row-val">No shared state</span></span>
+              </li>
+              <li class="compare-row compare-row--no">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Persists across restarts</span><span class="compare-row-val">No</span></span>
+              </li>
+              <li class="compare-row compare-row--no">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Multi-agent safe</span><span class="compare-row-val">No — one session only</span></span>
+              </li>
+              <li class="compare-row compare-row--no">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Runs as daemon</span><span class="compare-row-val">No</span></span>
+              </li>
+              <li class="compare-row compare-row--partial">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Works across tools</span><span class="compare-row-val">Session only</span></span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- AgentPeek MCP (featured) -->
+          <div class="compare-card compare-card--featured">
+            <div class="compare-card-badge">Recommended</div>
+            <div class="compare-card-icon compare-card-icon--violet">🔒</div>
+            <div class="compare-card-title">AgentPeek MCP</div>
+            <div class="compare-card-subtitle">agentpeek · shared daemon</div>
+            <ul class="compare-rows">
+              <li class="compare-row compare-row--yes">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Resource locking</span><span class="compare-row-val">✓ atomic, named</span></span>
+              </li>
+              <li class="compare-row compare-row--yes">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Shared state</span><span class="compare-row-val">✓ key-value notes</span></span>
+              </li>
+              <li class="compare-row compare-row--yes">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Persists across restarts</span><span class="compare-row-val">✓ UserDefaults</span></span>
+              </li>
+              <li class="compare-row compare-row--yes">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Multi-agent safe</span><span class="compare-row-val">✓ any MCP client</span></span>
+              </li>
+              <li class="compare-row compare-row--yes">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Runs as daemon</span><span class="compare-row-val">✓ LaunchAgent</span></span>
+              </li>
+              <li class="compare-row compare-row--yes">
+                <span class="compare-row-dot"></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Works across tools</span><span class="compare-row-val">✓ Claude+Cursor+Copilot</span></span>
+              </li>
+            </ul>
+          </div>
+
+        </div><!-- /compare-grid -->
+
+        <div class="compare-insight">
+          <span class="compare-insight-dot"></span>
+          <p>Shell scripts and skills give <strong>one agent</strong> visibility for one moment. AgentPeek gives <strong>every agent</strong> a shared coordination layer — Agent A locks <code>npm-install</code>, Agent B automatically waits. No conflicts. No manual work.</p>
+        </div>
+
+        <a href="#top" class="scroll-indicator" aria-label="Back to top" style="margin-top:8px">
+          ← Back to top
+        </a>
+
+      </div>
+    </section>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
