@@ -1,0 +1,11 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/adammorad/repos/agentpeek/.build/arm64-apple-macosx/debug/agentpeek'
+relocations:
+  - { offset: 0x89A9A, size: 0x8, addend: 0x0, symName: _agentpeek_main, symObjAddr: 0x0, symBinAddr: 0x100000898, symSize: 0xC8 }
+  - { offset: 0x89AB2, size: 0x8, addend: 0x0, symName: _agentpeek_main, symObjAddr: 0x0, symBinAddr: 0x100000898, symSize: 0xC8 }
+  - { offset: 0x89AD0, size: 0x8, addend: 0x0, symName: '_$sSa12_endMutationyyF', symObjAddr: 0x160, symBinAddr: 0x1000009F8, symSize: 0xC }
+  - { offset: 0x89AF3, size: 0x8, addend: 0x0, symName: '_$ss27_finalizeUninitializedArrayySayxGABnlF', symObjAddr: 0xC8, symBinAddr: 0x100000960, symSize: 0x40 }
+  - { offset: 0x89B1D, size: 0x8, addend: 0x0, symName: '_$ss5print_9separator10terminatoryypd_S2StFfA0_', symObjAddr: 0x108, symBinAddr: 0x1000009A0, symSize: 0x2C }
+  - { offset: 0x89B39, size: 0x8, addend: 0x0, symName: '_$ss5print_9separator10terminatoryypd_S2StFfA1_', symObjAddr: 0x134, symBinAddr: 0x1000009CC, symSize: 0x2C }
+...

@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/adammorad/repos/agentpeek/.build/arm64-apple-macosx/debug/agentpeek.build/primary.swiftdeps"
+  },
+  "/Users/adammorad/repos/agentpeek/Sources/agentpeek/main.swift": {
+    "dependencies": "/Users/adammorad/repos/agentpeek/.build/arm64-apple-macosx/debug/agentpeek.build/main.d",
+    "object": "/Users/adammorad/repos/agentpeek/.build/arm64-apple-macosx/debug/agentpeek.build/main.swift.o",
+    "swiftmodule": "/Users/adammorad/repos/agentpeek/.build/arm64-apple-macosx/debug/agentpeek.build/main~partial.swiftmodule",
+    "swift-dependencies": "/Users/adammorad/repos/agentpeek/.build/arm64-apple-macosx/debug/agentpeek.build/main.swiftdeps",
+    "diagnostics": "/Users/adammorad/repos/agentpeek/.build/arm64-apple-macosx/debug/agentpeek.build/main.dia"
+  }
+}
