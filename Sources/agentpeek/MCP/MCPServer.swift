@@ -71,7 +71,14 @@ final class MCPServer {
                 do {
                     responseBody = try await handler.handle(body)
                 } catch {
-                    let errBody = self.buildInternalErrorResponse()
+                    let parsedId: Any
+                    if let json = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
+                       let reqId = json["id"] {
+                        parsedId = reqId
+                    } else {
+                        parsedId = NSNull()
+                    }
+                    let errBody = self.buildInternalErrorResponse(id: parsedId)
                     connection.send(
                         content: self.buildHTTPResponse(body: errBody),
                         completion: .contentProcessed { _ in connection.cancel() }
@@ -97,6 +104,7 @@ final class MCPServer {
             "localhost:\(port)", "127.0.0.1:\(port)", "::1:\(port)"
         ]
         var hostFound = false
+        var contentTypeOK = false
         for line in lines.dropFirst() {
             let lower = line.lowercased()
             if lower.hasPrefix("host:") {
@@ -105,8 +113,12 @@ final class MCPServer {
                 hostFound = true
             }
             if lower.hasPrefix("origin:") { return false }
+            if lower.hasPrefix("content-type:") {
+                contentTypeOK = lower.contains("application/json")
+            }
         }
-        return hostFound
+        let isPost = lines.first?.uppercased().hasPrefix("POST") ?? false
+        return hostFound && (!isPost || contentTypeOK)
     }
 
     private func extractHeaderSection(from data: Data) -> String? {
@@ -127,10 +139,10 @@ final class MCPServer {
         return Data(header.utf8) + body
     }
 
-    private func buildInternalErrorResponse() -> Data {
+    private func buildInternalErrorResponse(id: Any = NSNull()) -> Data {
         let resp: [String: Any] = [
             "jsonrpc": "2.0",
-            "id": 0,
+            "id": id,
             "error": ["code": -32603, "message": "Internal error"]
         ]
         return (try? JSONSerialization.data(withJSONObject: resp)) ?? Data()
