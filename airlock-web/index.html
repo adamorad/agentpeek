@@ -36,7 +36,7 @@
         <div class="hero">
           <span class="hero-badge-row">
             <span class="hero-badge">AI Agent Coordination</span>
-            <a class="hero-gh" href="https://github.com/adamorad/airlock" target="_blank" rel="noopener">★ GitHub</a>
+            <a class="hero-gh" href="https://github.com/adamorad/airlock" target="_blank" rel="noopener"><svg class="hero-gh-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg> GitHub</a>
           </span>
           <h1>
             Your agents are stepping on each other.
@@ -54,7 +54,7 @@
         <!-- Terminal mockup -->
         <div class="terminal-pair" aria-hidden="true">
 
-          <!-- Agent A -->
+          <!-- Subagent A -->
           <div class="terminal-card">
             <div class="terminal-titlebar">
               <div class="terminal-dots">
@@ -62,17 +62,17 @@
                 <span class="terminal-dot terminal-dot--yellow"></span>
                 <span class="terminal-dot terminal-dot--green"></span>
               </div>
-              <span class="terminal-title">Claude Code — Session A</span>
+              <span class="terminal-title">Subagent A — refactor auth</span>
             </div>
             <div class="terminal-body">
-              <div><span class="t-prompt">&gt;</span> <span class="t-cmd">lock_resource("npm-install", ...)</span></div>
+              <div><span class="t-prompt">&gt;</span> <span class="t-cmd">lock_resource("file:src/auth.ts")</span></div>
               <div><span class="t-ok">✓</span> <span class="t-key">locked:</span> <span class="t-val">true</span></div>
-              <div><span class="t-prompt">&gt;</span> <span class="t-cmd">npm install</span></div>
-              <div><span class="t-dim">&nbsp;&nbsp;installing...</span></div>
+              <div><span class="t-prompt">&gt;</span> <span class="t-cmd">editing src/auth.ts</span></div>
+              <div><span class="t-dim">&nbsp;&nbsp;+ added OAuth handler</span></div>
             </div>
           </div>
 
-          <!-- Agent B -->
+          <!-- Subagent B -->
           <div class="terminal-card">
             <div class="terminal-titlebar">
               <div class="terminal-dots">
@@ -80,13 +80,13 @@
                 <span class="terminal-dot terminal-dot--yellow"></span>
                 <span class="terminal-dot terminal-dot--green"></span>
               </div>
-              <span class="terminal-title">Claude Code — Session B</span>
+              <span class="terminal-title">Subagent B — add 2FA</span>
             </div>
             <div class="terminal-body">
-              <div><span class="t-prompt">&gt;</span> <span class="t-cmd">lock_resource("npm-install", ...)</span></div>
+              <div><span class="t-prompt">&gt;</span> <span class="t-cmd">lock_resource("file:src/auth.ts")</span></div>
               <div><span class="t-fail">✗</span> <span class="t-key">locked:</span> <span class="t-val">false</span></div>
-              <div><span class="t-dim">&nbsp;&nbsp;held_by: "session-A"</span></div>
-              <div><span class="t-prompt">&gt;</span> <span class="t-dim">(waiting...)</span></div>
+              <div><span class="t-dim">&nbsp;&nbsp;held_by: "subagent-A"</span></div>
+              <div><span class="t-prompt">&gt;</span> <span class="t-dim">waiting for src/auth.ts…</span></div>
             </div>
           </div>
 
@@ -115,70 +115,77 @@
           <p class="fold4-sub">Whole categories of tools touch this space — session-scoped MCP servers, memory layers, DIY locks. They answer "what happened." Airlock answers "what's happening right now."</p>
         </div>
 
-        <div class="gh-compare-grid">
+        <div class="compare-matrix-wrap">
+          <table class="compare-matrix">
+            <thead>
+              <tr>
+                <th class="cm-cap-head" scope="col"><span class="visually-hidden">Capability</span></th>
+                <th scope="col">
+                  <span class="cm-col-name">Session-Scoped MCP</span>
+                  <span class="cm-col-sub">Node · per-session</span>
+                </th>
+                <th scope="col">
+                  <span class="cm-col-name">Memory Layers</span>
+                  <span class="cm-col-sub">mem0 · graphs</span>
+                </th>
+                <th scope="col">
+                  <span class="cm-col-name">DIY</span>
+                  <span class="cm-col-sub">Redis · lockfiles</span>
+                </th>
+                <th scope="col" class="cm-col-airlock">
+                  <span class="cm-col-name">Airlock</span>
+                  <span class="cm-col-sub">this one</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row" class="cm-cap">Always-on daemon</th>
+                <td class="cm-no">✗</td>
+                <td class="cm-no">✗</td>
+                <td class="cm-partial">~</td>
+                <td class="cm-yes cm-col-airlock">✓</td>
+              </tr>
+              <tr>
+                <th scope="row" class="cm-cap">Cross-session locks</th>
+                <td class="cm-no">✗</td>
+                <td class="cm-no">✗</td>
+                <td class="cm-partial">~</td>
+                <td class="cm-yes cm-col-airlock">✓</td>
+              </tr>
+              <tr>
+                <th scope="row" class="cm-cap">TTL auto-expiry</th>
+                <td class="cm-no">✗</td>
+                <td class="cm-no">✗</td>
+                <td class="cm-no">✗</td>
+                <td class="cm-yes cm-col-airlock">✓</td>
+              </tr>
+              <tr>
+                <th scope="row" class="cm-cap">Real-time arbitration</th>
+                <td class="cm-partial">~</td>
+                <td class="cm-no">✗</td>
+                <td class="cm-partial">~</td>
+                <td class="cm-yes cm-col-airlock">✓</td>
+              </tr>
+              <tr>
+                <th scope="row" class="cm-cap">MCP-native</th>
+                <td class="cm-yes">✓</td>
+                <td class="cm-partial">~</td>
+                <td class="cm-no">✗</td>
+                <td class="cm-yes cm-col-airlock">✓</td>
+              </tr>
+              <tr>
+                <th scope="row" class="cm-cap">Zero dependencies</th>
+                <td class="cm-no">✗</td>
+                <td class="cm-no">✗</td>
+                <td class="cm-no">✗</td>
+                <td class="cm-yes cm-col-airlock">✓</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <!-- Session-Scoped MCP Servers -->
-          <div class="gh-card">
-            <div class="gh-card-header">
-              <span class="gh-card-name">Session-Scoped MCP Servers</span>
-              <span class="gh-card-new">Node · per-session</span>
-            </div>
-            <p class="gh-card-desc">Some MCP servers offer locks or a task queue, but they live and die with the session that spawned them. Two sessions means two servers means no shared state.</p>
-            <ul class="gh-rows">
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Outlives sessions</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Cross-session locks</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Zero dependencies</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>MCP-native</span></li>
-            </ul>
-          </div>
-
-          <!-- Memory Layers -->
-          <div class="gh-card">
-            <div class="gh-card-header">
-              <span class="gh-card-name">Memory Layers</span>
-              <span class="gh-card-new">mem0 · knowledge graphs</span>
-            </div>
-            <p class="gh-card-desc">Store what an agent did so it can recall it later. They answer "what happened" — not "what is happening right now."</p>
-            <ul class="gh-rows">
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Resource locking</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Real-time arbitration</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>Recall / memory</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Zero dependencies</span></li>
-            </ul>
-          </div>
-
-          <!-- DIY (Redis · lockfiles) -->
-          <div class="gh-card">
-            <div class="gh-card-header">
-              <span class="gh-card-name">DIY (Redis · lockfiles)</span>
-              <span class="gh-card-new">roll your own</span>
-            </div>
-            <p class="gh-card-desc">Technically capable, but invisible to your agents: no MCP surface, manual setup, and lockfiles crash-deadlock with no TTL.</p>
-            <ul class="gh-rows">
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>Resource locking</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>MCP-native</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>TTL auto-expiry</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Zero setup</span></li>
-            </ul>
-          </div>
-
-          <!-- Airlock (featured) -->
-          <div class="gh-card gh-card--featured">
-            <div class="compare-card-badge">This one</div>
-            <div class="gh-card-header">
-              <span class="gh-card-name">Airlock</span>
-              <span class="gh-card-new">new</span>
-            </div>
-            <p class="gh-card-desc">Native macOS daemon that gives every agent a shared coordination layer — named locks with TTL, shared notes, no cloud.</p>
-            <ul class="gh-rows">
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Always-on daemon</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Cross-session locks + TTL</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ MCP-native</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Zero dependencies</span></li>
-            </ul>
-          </div>
-
-        </div><!-- /gh-compare-grid -->
+        <p class="compare-legend"><span class="cm-yes">✓</span> built in&nbsp;&nbsp;·&nbsp;&nbsp;<span class="cm-partial">~</span> possible with effort&nbsp;&nbsp;·&nbsp;&nbsp;<span class="cm-no">✗</span> not really</p>
 
         <div class="compare-insight">
           <span class="compare-insight-dot"></span>
@@ -206,7 +213,7 @@
 
           <!-- Shell workarounds -->
           <div class="compare-card">
-            <div class="compare-card-icon compare-card-icon--gray">🖥️</div>
+            <div class="compare-card-icon compare-card-icon--gray"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="5 8 9 12 5 16"></polyline><line x1="12" y1="16" x2="19" y2="16"></line></svg></div>
             <div class="compare-card-title">Shell Workarounds</div>
             <div class="compare-card-subtitle">lockfiles · flock · manual scripts</div>
             <ul class="compare-rows">
@@ -239,7 +246,7 @@
 
           <!-- Session-scoped skills -->
           <div class="compare-card">
-            <div class="compare-card-icon compare-card-icon--blue">⚡</div>
+            <div class="compare-card-icon compare-card-icon--blue"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 4 14 11 14 10 22 19 10 12 10 13 2"></polygon></svg></div>
             <div class="compare-card-title">Session-Scoped Skills</div>
             <div class="compare-card-subtitle">claude code skills · one session</div>
             <ul class="compare-rows">
@@ -273,7 +280,7 @@
           <!-- Airlock MCP (featured) -->
           <div class="compare-card compare-card--featured">
             <div class="compare-card-badge">Recommended</div>
-            <div class="compare-card-icon compare-card-icon--violet">🔒</div>
+            <div class="compare-card-icon compare-card-icon--violet"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg></div>
             <div class="compare-card-title">Airlock MCP</div>
             <div class="compare-card-subtitle">airlock · shared daemon</div>
             <ul class="compare-rows">
