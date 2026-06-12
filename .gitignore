@@ -2,3 +2,8 @@
 .DS_Store
 *.o
 *.d
+
+# Go
+/airlock
+*.test
+state.db*
