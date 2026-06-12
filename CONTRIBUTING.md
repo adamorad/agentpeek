@@ -21,7 +21,7 @@ swift test
 
 ## Local integration smoke
 
-CI runs an end-to-end smoke against a release build of the daemon. To run it locally, build with `swift build -c release`, make sure nothing else is bound to port 27183 (stop any running agentpeek instance first), then run the commands from the **Integration smoke** step in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) against `.build/release/agentpeek`.
+CI runs an end-to-end smoke against a release build of the daemon. To run it locally, build with `swift build -c release`, make sure nothing else is bound to port 27183 (stop any running agentpeek instance first), then run the commands from the **Integration smoke** step in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) against `.build/release/agentpeek`. Remember to kill the backgrounded daemon afterward (`kill %1` or `pkill -f '/agentpeek$'`), and note that the smoke writes to your real UserDefaults unless you launch the daemon with `AGENTPEEK_DEFAULTS_SUITE` set to a throwaway suite name.
 
 ## Branch convention
 
