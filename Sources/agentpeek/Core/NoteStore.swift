@@ -14,8 +14,12 @@ final class NoteStore {
     private let queue = DispatchQueue(label: "com.agentpeek.notes")
     private var notes: [String: Note] = [:]
     private let defaultsKey = "agentpeek.notes"
+    private let defaults: UserDefaults
 
-    init() { load() }
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        load()
+    }
 
     func set(key: String, value: String, author: String?, ttlMinutes: Int?) {
         queue.sync {
@@ -58,11 +62,11 @@ final class NoteStore {
 
     private func save() {
         let data = try? JSONEncoder().encode(notes)
-        UserDefaults.standard.set(data, forKey: defaultsKey)
+        defaults.set(data, forKey: defaultsKey)
     }
 
     private func load() {
-        guard let data = UserDefaults.standard.data(forKey: defaultsKey),
+        guard let data = defaults.data(forKey: defaultsKey),
               let decoded = try? JSONDecoder().decode([String: Note].self, from: data) else { return }
         notes = decoded
     }
