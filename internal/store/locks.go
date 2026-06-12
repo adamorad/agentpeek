@@ -662,6 +662,62 @@ func (m *LockManager) Renew(name, lockToken string, ttlSeconds int) (LockResult,
 	}, nil
 }
 
+// RenewByAgent is the v1-compatible renew path: it extends the named lock by
+// ttlSeconds only if the live holder's agent_id matches agentID (capability via
+// identity rather than via lock_token). Same error contract as Renew:
+// ErrInvalidTTL for bad ttl, ErrNotFound if there is no live lock, ErrNotOwned
+// if the holder is a different agent. Prefer Renew (token-based) for new code.
+func (m *LockManager) RenewByAgent(name, agentID string, ttlSeconds int) (LockResult, error) {
+	if ttlSeconds <= 0 {
+		return LockResult{}, ErrInvalidTTL
+	}
+	now := Now()
+	expiresAt := now + int64(ttlSeconds)
+
+	var outErr error
+	txErr := m.s.tx(func(tx *sql.Tx) error {
+		var (
+			rowAgent   string
+			rowExpires int64
+		)
+		qerr := tx.QueryRow(
+			"SELECT agent_id, expires_at FROM locks WHERE name = ?", name,
+		).Scan(&rowAgent, &rowExpires)
+		if errors.Is(qerr, sql.ErrNoRows) {
+			outErr = ErrNotFound
+			return nil
+		}
+		if qerr != nil {
+			return qerr
+		}
+		if rowExpires <= now {
+			// Already expired — a renew cannot resurrect it.
+			outErr = ErrNotFound
+			return nil
+		}
+		if agentID == "" || agentID != rowAgent {
+			outErr = ErrNotOwned
+			return nil
+		}
+		if _, e := tx.Exec(
+			"UPDATE locks SET expires_at = ? WHERE name = ?", expiresAt, name,
+		); e != nil {
+			return e
+		}
+		return nil
+	})
+	if txErr != nil {
+		return LockResult{}, txErr
+	}
+	if outErr != nil {
+		return LockResult{}, outErr
+	}
+	return LockResult{
+		Locked:           true,
+		ExpiresInSeconds: ttlSeconds,
+	}, nil
+}
+
 // ListLocks returns a snapshot of all currently live (non-expired) locks.
 func (m *LockManager) ListLocks() ([]LockInfo, error) {
 	now := Now()

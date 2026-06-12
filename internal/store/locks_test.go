@@ -577,3 +577,37 @@ func TestConcurrentAcquireSingleWinner(t *testing.T) {
 		t.Fatalf("exactly one goroutine should acquire, got %d winners", wins)
 	}
 }
+
+func TestRenewByAgent(t *testing.T) {
+	m := newManager(t)
+	ctx := context.Background()
+
+	res, err := m.Lock(ctx, "res", "agentA", 30, 0, "")
+	if err != nil || !res.Locked {
+		t.Fatalf("setup lock: res=%+v err=%v", res, err)
+	}
+
+	// Correct holder renews successfully.
+	rn, err := m.RenewByAgent("res", "agentA", 120)
+	if err != nil {
+		t.Fatalf("RenewByAgent agentA: %v", err)
+	}
+	if !rn.Locked || rn.ExpiresInSeconds != 120 {
+		t.Fatalf("RenewByAgent result = %+v, want Locked w/ 120s", rn)
+	}
+
+	// Wrong agent is rejected.
+	if _, err := m.RenewByAgent("res", "agentB", 60); !errors.Is(err, ErrNotOwned) {
+		t.Fatalf("RenewByAgent agentB err = %v, want ErrNotOwned", err)
+	}
+
+	// Unknown lock name is ErrNotFound.
+	if _, err := m.RenewByAgent("nope", "agentA", 60); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("RenewByAgent unknown err = %v, want ErrNotFound", err)
+	}
+
+	// Non-positive ttl is rejected.
+	if _, err := m.RenewByAgent("res", "agentA", 0); !errors.Is(err, ErrInvalidTTL) {
+		t.Fatalf("RenewByAgent ttl=0 err = %v, want ErrInvalidTTL", err)
+	}
+}

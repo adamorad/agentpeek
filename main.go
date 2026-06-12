@@ -4,14 +4,18 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime"
 	"syscall"
 
 	"github.com/adamorad/airlock/internal/cli"
+	"github.com/adamorad/airlock/internal/mcp"
+	"github.com/adamorad/airlock/internal/store"
 	"github.com/adamorad/airlock/internal/version"
 )
 
@@ -52,8 +56,8 @@ func run(args []string) int {
 	}
 }
 
-// runDaemon resolves configuration and starts the daemon. For now it prints the
-// startup banner and blocks; the real MCP server is wired in by a later task.
+// runDaemon resolves configuration, opens the store, assembles the managers and
+// MCP handler, and serves until interrupted (SIGINT/SIGTERM).
 func runDaemon(args []string) int {
 	fs := flag.NewFlagSet("daemon", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
@@ -62,19 +66,68 @@ func runDaemon(args []string) int {
 		return 2
 	}
 
-	// db path is resolved here but intentionally not opened yet.
-	_ = resolveDBPath(*dbFlag)
+	dbPath := resolveDBPath(*dbFlag)
+	s, err := store.OpenDB(dbPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s: open db: %v\n", version.Name, err)
+		return 1
+	}
+	defer s.Close()
 
-	fmt.Printf("%s %s — starting on %s\n", version.Name, version.Number, defaultAddr)
+	// Assemble the managers. Presence depends on the lock manager so it can
+	// release a dead agent's locks on expiry.
+	lm := store.NewLockManager(s)
+	pm := store.NewPresenceManager(s, lm)
+	em := store.NewEventManager(s)
+	tm := store.NewTaskManager(s)
 
-	// Block until interrupted. A later task replaces this with the real server
-	// lifecycle (mcp.Server.Start backed by an opened store). Waiting on a
-	// signal keeps the process alive without a runtime deadlock and gives the
-	// future server a natural shutdown hook.
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
-	<-sig
+	// One ctx drives both the background reapers and the HTTP server shutdown.
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer cancel()
+
+	lm.Start(ctx)
+	pm.Start(ctx)
+	tm.Start(ctx)
+
+	// Auth posture: on darwin we rely on loopback-only binding plus Host/Origin
+	// checks (single-user dev box). On other OSes (Linux/multi-user) we require a
+	// bearer token stored 0600 under ~/.airlock. AIRLOCK_TOKEN overrides on any OS.
+	token := ""
+	tokenPath := ""
+	if t := os.Getenv("AIRLOCK_TOKEN"); t != "" {
+		token = t
+	} else if runtime.GOOS != "darwin" {
+		tokenPath = tokenFilePath()
+		token, err = mcp.EnsureTokenFile(tokenPath, true)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%s: token: %v\n", version.Name, err)
+			return 1
+		}
+	}
+
+	h := mcp.NewToolHandler(lm, pm, em, tm, s)
+	srv := mcp.New(h, mcp.Options{Addr: defaultAddr, Token: token})
+
+	fmt.Printf("%s %s — listening on http://%s\n", version.Name, version.Number, defaultAddr)
+	if token != "" && tokenPath != "" {
+		fmt.Printf("  bearer token: %s\n", tokenPath)
+	}
+
+	if err := srv.Start(ctx); err != nil {
+		fmt.Fprintf(os.Stderr, "%s: serve: %v\n", version.Name, err)
+		return 1
+	}
 	return 0
+}
+
+// tokenFilePath returns the path to the bearer-token file (~/.airlock/token),
+// falling back to a relative path if the home dir cannot be resolved.
+func tokenFilePath() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return filepath.Join(".airlock", "token")
+	}
+	return filepath.Join(home, ".airlock", "token")
 }
 
 // resolveDBPath determines the state database path using this precedence:
