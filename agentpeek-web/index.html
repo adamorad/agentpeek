@@ -34,7 +34,10 @@
       <div class="fold1-inner">
 
         <div class="hero">
-          <span class="hero-badge">AI Agent Coordination</span>
+          <span class="hero-badge-row">
+            <span class="hero-badge">AI Agent Coordination</span>
+            <a class="hero-gh" href="https://github.com/adamorad/agentpeek" target="_blank" rel="noopener">★ GitHub</a>
+          </span>
           <h1>
             Your agents are stepping on each other.
             <span class="hero-accent">AgentPeek fixes that.</span>
@@ -107,58 +110,55 @@
       <div class="fold4-inner">
 
         <div class="fold4-header">
-          <span class="fold4-label">GitHub Landscape</span>
+          <span class="fold4-label">The Landscape</span>
           <h2 class="fold4-headline">Other tools store memory.<br><span class="fold4-headline-accent">AgentPeek prevents conflicts.</span></h2>
-          <p class="fold4-sub">The closest projects on GitHub focus on memory recall — what an agent did. AgentPeek focuses on real-time coordination — what two agents are doing right now.</p>
+          <p class="fold4-sub">Whole categories of tools touch this space — session-scoped MCP servers, memory layers, DIY locks. They answer "what happened." AgentPeek answers "what's happening right now."</p>
         </div>
 
         <div class="gh-compare-grid">
 
-          <!-- engram -->
+          <!-- Session-Scoped MCP Servers -->
           <div class="gh-card">
             <div class="gh-card-header">
-              <span class="gh-card-name">engram</span>
-              <a href="https://github.com/Bra1nSpread/engram" class="gh-card-stars" target="_blank" rel="noopener">★ 4.3k</a>
+              <span class="gh-card-name">Session-Scoped MCP Servers</span>
+              <span class="gh-card-new">Node · per-session</span>
             </div>
-            <p class="gh-card-desc">Knowledge graph memory for AI agents. Stores facts and relationships so agents can recall past context.</p>
+            <p class="gh-card-desc">Some MCP servers offer locks or a task queue, but they live and die with the session that spawned them. Two sessions means two servers means no shared state.</p>
+            <ul class="gh-rows">
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Outlives sessions</span></li>
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Cross-session locks</span></li>
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Zero dependencies</span></li>
+              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>MCP-native</span></li>
+            </ul>
+          </div>
+
+          <!-- Memory Layers -->
+          <div class="gh-card">
+            <div class="gh-card-header">
+              <span class="gh-card-name">Memory Layers</span>
+              <span class="gh-card-new">mem0 · knowledge graphs</span>
+            </div>
+            <p class="gh-card-desc">Store what an agent did so it can recall it later. They answer "what happened" — not "what is happening right now."</p>
             <ul class="gh-rows">
               <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Resource locking</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Always-on daemon</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Cross-agent coordination</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>Memory / recall</span></li>
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Real-time arbitration</span></li>
+              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>Recall / memory</span></li>
               <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Zero dependencies</span></li>
             </ul>
           </div>
 
-          <!-- mem0 -->
+          <!-- DIY (Redis · lockfiles) -->
           <div class="gh-card">
             <div class="gh-card-header">
-              <span class="gh-card-name">mem0</span>
-              <a href="https://github.com/mem0ai/mem0" class="gh-card-stars" target="_blank" rel="noopener">★ 27k</a>
+              <span class="gh-card-name">DIY (Redis · lockfiles)</span>
+              <span class="gh-card-new">roll your own</span>
             </div>
-            <p class="gh-card-desc">Persistent memory layer for AI apps. Cloud-first service that stores and retrieves agent memories across sessions.</p>
+            <p class="gh-card-desc">Technically capable, but invisible to your agents: no MCP surface, manual setup, and lockfiles crash-deadlock with no TTL.</p>
             <ul class="gh-rows">
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Resource locking</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Always-on daemon</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Cross-agent coordination</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>Memory / recall</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Zero dependencies</span></li>
-            </ul>
-          </div>
-
-          <!-- mcp-server-memory -->
-          <div class="gh-card">
-            <div class="gh-card-header">
-              <span class="gh-card-name">mcp-server-memory</span>
-              <a href="https://github.com/modelcontextprotocol/servers" class="gh-card-stars" target="_blank" rel="noopener">★ 12k</a>
-            </div>
-            <p class="gh-card-desc">Official MCP reference server for in-process memory. Per-session knowledge graph — not shared between agents.</p>
-            <ul class="gh-rows">
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Resource locking</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Always-on daemon</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Cross-agent coordination</span></li>
-              <li class="gh-row gh-row--partial"><span class="gh-dot"></span><span>Memory / recall (per-session)</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>Zero dependencies</span></li>
+              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>Resource locking</span></li>
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>MCP-native</span></li>
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>TTL auto-expiry</span></li>
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Zero setup</span></li>
             </ul>
           </div>
 
@@ -169,12 +169,11 @@
               <span class="gh-card-name">AgentPeek</span>
               <span class="gh-card-new">new</span>
             </div>
-            <p class="gh-card-desc">Native macOS daemon that gives every agent a shared coordination layer — atomic locks, shared notes, no cloud.</p>
+            <p class="gh-card-desc">Native macOS daemon that gives every agent a shared coordination layer — named locks with TTL, shared notes, no cloud.</p>
             <ul class="gh-rows">
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Resource locking</span></li>
               <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Always-on daemon</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Cross-agent coordination</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Shared scratchpad</span></li>
+              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Cross-session locks + TTL</span></li>
+              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ MCP-native</span></li>
               <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Zero dependencies</span></li>
             </ul>
           </div>
@@ -183,7 +182,7 @@
 
         <div class="compare-insight">
           <span class="compare-insight-dot"></span>
-          <p>Memory tools answer <strong>"what did Agent A do last week?"</strong> AgentPeek answers <strong>"is Agent A using this file right now?"</strong> — the problem is different, the solution is different.</p>
+          <p>Session-scoped servers die with the session that spawned them. AgentPeek is a daemon — it outlives every session and arbitrates between all of them.</p>
         </div>
 
       </div>
@@ -280,7 +279,7 @@
             <ul class="compare-rows">
               <li class="compare-row compare-row--yes">
                 <span class="compare-row-dot"></span>
-                <span class="compare-row-text"><span class="compare-row-cat">Resource locking</span><span class="compare-row-val">✓ atomic, named</span></span>
+                <span class="compare-row-text"><span class="compare-row-cat">Resource locking</span><span class="compare-row-val">✓ named, with TTL</span></span>
               </li>
               <li class="compare-row compare-row--yes">
                 <span class="compare-row-dot"></span>
@@ -309,7 +308,7 @@
 
         <div class="compare-insight">
           <span class="compare-insight-dot"></span>
-          <p>Shell scripts and skills give <strong>one agent</strong> visibility for one moment. AgentPeek gives <strong>every agent</strong> a shared coordination layer — Agent A locks <code>npm-install</code>, Agent B automatically waits. No conflicts. No manual work.</p>
+          <p>Shell scripts and skills give <strong>one agent</strong> visibility for one moment. AgentPeek gives <strong>every agent</strong> a shared coordination layer — Agent A locks <code>npm-install</code>, Agent B sees it's held and backs off. No conflicts. No manual work.</p>
         </div>
 
       </div>
@@ -396,6 +395,10 @@
           </div>
 
         </div><!-- /setup-steps -->
+
+        <div class="roadmap-teaser">
+          v2 in design: blocking waits · atomic counters · Linux — <a href="https://github.com/adamorad/agentpeek/blob/main/docs/ROADMAP-v2.md" target="_blank" rel="noopener">read the roadmap →</a>
+        </div>
 
       </div>
 
