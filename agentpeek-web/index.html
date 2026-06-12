@@ -97,93 +97,99 @@
 
       </div>
 
-      <a class="scroll-indicator" href="#tools" aria-label="Jump to MCP tools">
-        See the 7 MCP tools <span class="scroll-arrow" aria-hidden="true">↓</span>
+      <a class="scroll-indicator" href="#vs-github" aria-label="Jump to GitHub comparison">
+        How does it compare? <span class="scroll-arrow" aria-hidden="true">↓</span>
       </a>
     </section>
 
-    <!-- ── Fold 2: Tools ──────────────────────────────────────── -->
-    <section class="fold2" id="tools">
-      <div class="fold2-inner">
+    <!-- ── Fold 2: vs. GitHub ─────────────────────────────────────── -->
+    <section class="fold4" id="vs-github">
+      <div class="fold4-inner">
 
-        <div class="fold2-header">
-          <span class="fold2-label">7 MCP Tools</span>
-          <h2 class="fold2-headline">Everything agents need to coordinate.</h2>
-          <p class="fold2-sub">All tools available on <code style="font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(167,139,250,0.8)">127.0.0.1:27183</code> — any MCP-compatible agent, one shared daemon.</p>
+        <div class="fold4-header">
+          <span class="fold4-label">GitHub Landscape</span>
+          <h2 class="fold4-headline">Other tools store memory.<br><span class="fold4-headline-accent">AgentPeek prevents conflicts.</span></h2>
+          <p class="fold4-sub">The closest projects on GitHub focus on memory recall — what an agent did. AgentPeek focuses on real-time coordination — what two agents are doing right now.</p>
         </div>
 
-        <!-- Tool groups -->
-        <div class="tool-groups" role="list" aria-label="Available MCP tools">
+        <div class="gh-compare-grid">
 
-          <div class="tool-group" role="listitem">
-            <span class="tool-group-label">Locks</span>
-            <div class="tool-pills">
-              <span class="tool-pill">lock_resource</span>
-              <span class="tool-pill">unlock_resource</span>
-              <span class="tool-pill">renew_lock</span>
-              <span class="tool-pill">list_locks</span>
+          <!-- engram -->
+          <div class="gh-card">
+            <div class="gh-card-header">
+              <span class="gh-card-name">engram</span>
+              <a href="https://github.com/Bra1nSpread/engram" class="gh-card-stars" target="_blank" rel="noopener">★ 4.3k</a>
             </div>
+            <p class="gh-card-desc">Knowledge graph memory for AI agents. Stores facts and relationships so agents can recall past context.</p>
+            <ul class="gh-rows">
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Resource locking</span></li>
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Always-on daemon</span></li>
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Cross-agent coordination</span></li>
+              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>Memory / recall</span></li>
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Zero dependencies</span></li>
+            </ul>
           </div>
 
-          <div class="tool-group" role="listitem">
-            <span class="tool-group-label">Scratchpad</span>
-            <div class="tool-pills">
-              <span class="tool-pill">set_note</span>
-              <span class="tool-pill">get_note</span>
-              <span class="tool-pill">list_notes</span>
+          <!-- mem0 -->
+          <div class="gh-card">
+            <div class="gh-card-header">
+              <span class="gh-card-name">mem0</span>
+              <a href="https://github.com/mem0ai/mem0" class="gh-card-stars" target="_blank" rel="noopener">★ 27k</a>
             </div>
+            <p class="gh-card-desc">Persistent memory layer for AI apps. Cloud-first service that stores and retrieves agent memories across sessions.</p>
+            <ul class="gh-rows">
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Resource locking</span></li>
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Always-on daemon</span></li>
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Cross-agent coordination</span></li>
+              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>Memory / recall</span></li>
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Zero dependencies</span></li>
+            </ul>
           </div>
 
-        </div><!-- /tool-groups -->
-
-        <!-- Install steps -->
-        <div class="setup-steps">
-
-          <!-- Step 1 -->
-          <div class="step-card">
-            <div class="step-card-header">
-              <div class="step-num" aria-hidden="true">1</div>
-              <p class="step-title">Install via Homebrew</p>
+          <!-- mcp-server-memory -->
+          <div class="gh-card">
+            <div class="gh-card-header">
+              <span class="gh-card-name">mcp-server-memory</span>
+              <a href="https://github.com/modelcontextprotocol/servers" class="gh-card-stars" target="_blank" rel="noopener">★ 12k</a>
             </div>
-            <p class="step-desc">Installs the binary and places the LaunchAgent plist on your system.</p>
-            <div class="config-row">
-              <code id="step1-cmd">brew install adamorad/tap/agentpeek</code>
-              <button class="copy-btn" data-copy="step1-cmd" aria-label="Copy install command">Copy</button>
-            </div>
+            <p class="gh-card-desc">Official MCP reference server for in-process memory. Per-session knowledge graph — not shared between agents.</p>
+            <ul class="gh-rows">
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Resource locking</span></li>
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Always-on daemon</span></li>
+              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Cross-agent coordination</span></li>
+              <li class="gh-row gh-row--partial"><span class="gh-dot"></span><span>Memory / recall (per-session)</span></li>
+              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>Zero dependencies</span></li>
+            </ul>
           </div>
 
-          <!-- Step 2 -->
-          <div class="step-card">
-            <div class="step-card-header">
-              <div class="step-num" aria-hidden="true">2</div>
-              <p class="step-title">Load daemon</p>
+          <!-- AgentPeek (featured) -->
+          <div class="gh-card gh-card--featured">
+            <div class="compare-card-badge">This one</div>
+            <div class="gh-card-header">
+              <span class="gh-card-name">AgentPeek</span>
+              <span class="gh-card-new">new</span>
             </div>
-            <p class="step-desc">Register with launchd so AgentPeek starts automatically at login.</p>
-            <div class="config-row">
-              <code id="step2-cmd">cp $(brew --prefix)/share/agentpeek/com.agentpeek.daemon.plist ~/Library/LaunchAgents/ &amp;&amp; launchctl load ~/Library/LaunchAgents/com.agentpeek.daemon.plist</code>
-              <button class="copy-btn" data-copy="step2-cmd" aria-label="Copy launchd command">Copy</button>
-            </div>
+            <p class="gh-card-desc">Native macOS daemon that gives every agent a shared coordination layer — atomic locks, shared notes, no cloud.</p>
+            <ul class="gh-rows">
+              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Resource locking</span></li>
+              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Always-on daemon</span></li>
+              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Cross-agent coordination</span></li>
+              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Shared scratchpad</span></li>
+              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Zero dependencies</span></li>
+            </ul>
           </div>
 
-          <!-- Step 3 -->
-          <div class="step-card">
-            <div class="step-card-header">
-              <div class="step-num" aria-hidden="true">3</div>
-              <p class="step-title">Configure agent</p>
-            </div>
-            <p class="step-desc">Add to <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:4px">~/.claude/mcp_servers.json</code></p>
-            <div class="config-row">
-              <pre id="step3-cmd">{"agentpeek": {"transport": "http", "url": "http://127.0.0.1:27183"}}</pre>
-              <button class="copy-btn" data-copy="step3-cmd" aria-label="Copy MCP config JSON">Copy</button>
-            </div>
-          </div>
+        </div><!-- /gh-compare-grid -->
 
-        </div><!-- /setup-steps -->
+        <div class="compare-insight">
+          <span class="compare-insight-dot"></span>
+          <p>Memory tools answer <strong>"what did Agent A do last week?"</strong> AgentPeek answers <strong>"is Agent A using this file right now?"</strong> — the problem is different, the solution is different.</p>
+        </div>
 
       </div>
 
-      <a class="scroll-indicator" href="#compare" aria-label="Jump to comparison">
-        How does it compare? <span class="scroll-arrow" aria-hidden="true">↓</span>
+      <a class="scroll-indicator" href="#compare" aria-label="Jump to approach comparison">
+        vs. other approaches <span class="scroll-arrow" aria-hidden="true">↓</span>
       </a>
     </section>
 
@@ -306,102 +312,96 @@
           <p>Shell scripts and skills give <strong>one agent</strong> visibility for one moment. AgentPeek gives <strong>every agent</strong> a shared coordination layer — Agent A locks <code>npm-install</code>, Agent B automatically waits. No conflicts. No manual work.</p>
         </div>
 
-        <a class="scroll-indicator" href="#vs-github" aria-label="Jump to GitHub comparison">
-          vs. similar GitHub projects <span class="scroll-arrow" aria-hidden="true">↓</span>
-        </a>
-
       </div>
+
+      <a class="scroll-indicator" href="#tools" aria-label="Jump to MCP tools">
+        See the 7 MCP tools <span class="scroll-arrow" aria-hidden="true">↓</span>
+      </a>
     </section>
 
-    <!-- ── Fold 4: vs. GitHub ─────────────────────────────────────── -->
-    <section class="fold4" id="vs-github">
-      <div class="fold4-inner">
+    <!-- ── Fold 4: Tools ──────────────────────────────────────── -->
+    <section class="fold2" id="tools">
+      <div class="fold2-inner">
 
-        <div class="fold4-header">
-          <span class="fold4-label">GitHub Landscape</span>
-          <h2 class="fold4-headline">Other tools store memory.<br><span class="fold4-headline-accent">AgentPeek prevents conflicts.</span></h2>
-          <p class="fold4-sub">The closest projects on GitHub focus on memory recall — what an agent did. AgentPeek focuses on real-time coordination — what two agents are doing right now.</p>
+        <div class="fold2-header">
+          <span class="fold2-label">7 MCP Tools</span>
+          <h2 class="fold2-headline">Everything agents need to coordinate.</h2>
+          <p class="fold2-sub">All tools available on <code style="font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(167,139,250,0.8)">127.0.0.1:27183</code> — any MCP-compatible agent, one shared daemon.</p>
         </div>
 
-        <div class="gh-compare-grid">
+        <!-- Tool groups -->
+        <div class="tool-groups" role="list" aria-label="Available MCP tools">
 
-          <!-- engram -->
-          <div class="gh-card">
-            <div class="gh-card-header">
-              <span class="gh-card-name">engram</span>
-              <a href="https://github.com/Bra1nSpread/engram" class="gh-card-stars" target="_blank" rel="noopener">★ 4.3k</a>
+          <div class="tool-group" role="listitem">
+            <span class="tool-group-label">Locks</span>
+            <div class="tool-pills">
+              <span class="tool-pill">lock_resource</span>
+              <span class="tool-pill">unlock_resource</span>
+              <span class="tool-pill">renew_lock</span>
+              <span class="tool-pill">list_locks</span>
             </div>
-            <p class="gh-card-desc">Knowledge graph memory for AI agents. Stores facts and relationships so agents can recall past context.</p>
-            <ul class="gh-rows">
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Resource locking</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Always-on daemon</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Cross-agent coordination</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>Memory / recall</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Zero dependencies</span></li>
-            </ul>
           </div>
 
-          <!-- mem0 -->
-          <div class="gh-card">
-            <div class="gh-card-header">
-              <span class="gh-card-name">mem0</span>
-              <a href="https://github.com/mem0ai/mem0" class="gh-card-stars" target="_blank" rel="noopener">★ 27k</a>
+          <div class="tool-group" role="listitem">
+            <span class="tool-group-label">Scratchpad</span>
+            <div class="tool-pills">
+              <span class="tool-pill">set_note</span>
+              <span class="tool-pill">get_note</span>
+              <span class="tool-pill">list_notes</span>
             </div>
-            <p class="gh-card-desc">Persistent memory layer for AI apps. Cloud-first service that stores and retrieves agent memories across sessions.</p>
-            <ul class="gh-rows">
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Resource locking</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Always-on daemon</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Cross-agent coordination</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>Memory / recall</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Zero dependencies</span></li>
-            </ul>
           </div>
 
-          <!-- mcp-server-memory -->
-          <div class="gh-card">
-            <div class="gh-card-header">
-              <span class="gh-card-name">mcp-server-memory</span>
-              <a href="https://github.com/modelcontextprotocol/servers" class="gh-card-stars" target="_blank" rel="noopener">★ 12k</a>
+        </div><!-- /tool-groups -->
+
+        <!-- Install steps -->
+        <div class="setup-steps">
+
+          <!-- Step 1 -->
+          <div class="step-card">
+            <div class="step-card-header">
+              <div class="step-num" aria-hidden="true">1</div>
+              <p class="step-title">Install via Homebrew</p>
             </div>
-            <p class="gh-card-desc">Official MCP reference server for in-process memory. Per-session knowledge graph — not shared between agents.</p>
-            <ul class="gh-rows">
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Resource locking</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Always-on daemon</span></li>
-              <li class="gh-row gh-row--no"><span class="gh-dot"></span><span>Cross-agent coordination</span></li>
-              <li class="gh-row gh-row--partial"><span class="gh-dot"></span><span>Memory / recall (per-session)</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>Zero dependencies</span></li>
-            </ul>
+            <p class="step-desc">Installs the binary and places the LaunchAgent plist on your system.</p>
+            <div class="config-row">
+              <code id="step1-cmd">brew install adamorad/tap/agentpeek</code>
+              <button class="copy-btn" data-copy="step1-cmd" aria-label="Copy install command">Copy</button>
+            </div>
           </div>
 
-          <!-- AgentPeek (featured) -->
-          <div class="gh-card gh-card--featured">
-            <div class="compare-card-badge">This one</div>
-            <div class="gh-card-header">
-              <span class="gh-card-name">AgentPeek</span>
-              <span class="gh-card-new">new</span>
+          <!-- Step 2 -->
+          <div class="step-card">
+            <div class="step-card-header">
+              <div class="step-num" aria-hidden="true">2</div>
+              <p class="step-title">Load daemon</p>
             </div>
-            <p class="gh-card-desc">Native macOS daemon that gives every agent a shared coordination layer — atomic locks, shared notes, no cloud.</p>
-            <ul class="gh-rows">
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Resource locking</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Always-on daemon</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Cross-agent coordination</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Shared scratchpad</span></li>
-              <li class="gh-row gh-row--yes"><span class="gh-dot"></span><span>✓ Zero dependencies</span></li>
-            </ul>
+            <p class="step-desc">Register with launchd so AgentPeek starts automatically at login.</p>
+            <div class="config-row">
+              <code id="step2-cmd">cp $(brew --prefix)/share/agentpeek/com.agentpeek.daemon.plist ~/Library/LaunchAgents/ &amp;&amp; launchctl load ~/Library/LaunchAgents/com.agentpeek.daemon.plist</code>
+              <button class="copy-btn" data-copy="step2-cmd" aria-label="Copy launchd command">Copy</button>
+            </div>
           </div>
 
-        </div><!-- /gh-compare-grid -->
+          <!-- Step 3 -->
+          <div class="step-card">
+            <div class="step-card-header">
+              <div class="step-num" aria-hidden="true">3</div>
+              <p class="step-title">Configure agent</p>
+            </div>
+            <p class="step-desc">Add to <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:4px">~/.claude/mcp_servers.json</code></p>
+            <div class="config-row">
+              <pre id="step3-cmd">{"agentpeek": {"transport": "http", "url": "http://127.0.0.1:27183"}}</pre>
+              <button class="copy-btn" data-copy="step3-cmd" aria-label="Copy MCP config JSON">Copy</button>
+            </div>
+          </div>
 
-        <div class="compare-insight">
-          <span class="compare-insight-dot"></span>
-          <p>Memory tools answer <strong>"what did Agent A do last week?"</strong> AgentPeek answers <strong>"is Agent A using this file right now?"</strong> — the problem is different, the solution is different.</p>
-        </div>
-
-        <a href="#top" class="scroll-indicator" aria-label="Back to top" style="margin-top:8px">
-          ← Back to top
-        </a>
+        </div><!-- /setup-steps -->
 
       </div>
+
+      <a href="#top" class="scroll-indicator" aria-label="Back to top" style="margin-top:8px">
+        ← Back to top
+      </a>
     </section>
 
     <script type="module" src="/src/main.js"></script>
