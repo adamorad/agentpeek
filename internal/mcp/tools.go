@@ -269,9 +269,11 @@ func toolDefs() []toolDef {
 }
 
 // callTool dispatches a single tool invocation to the appropriate store call
-// and returns the v1-compatible result map. An unknown tool name returns an
-// {"error": ...} result map (NOT a JSON-RPC error), matching v1.
-func (h *toolHandler) callTool(ctx context.Context, name string, args map[string]any) map[string]any {
+// and returns the v1-compatible result. Most tools return a result map; the
+// list_* tools return a bare JSON array (a []map[string]any) to match the v1
+// wire shape. An unknown tool name returns an {"error": ...} result map (NOT a
+// JSON-RPC error), matching v1.
+func (h *toolHandler) callTool(ctx context.Context, name string, args map[string]any) any {
 	switch name {
 	// --- LOCKS ---
 	case "lock_resource":
@@ -410,7 +412,10 @@ func (h *toolHandler) renewLock(args map[string]any) map[string]any {
 	return map[string]any{"renewed": true, "expires_in_seconds": res.ExpiresInSeconds}
 }
 
-func (h *toolHandler) listLocks() map[string]any {
+// listLocks returns a bare JSON array of held locks ([{name, agent_id,
+// expires_in_seconds}, ...]) to match the v1 wire shape. On error it returns an
+// {"error": ...} map instead (both marshal cleanly into content[0].text).
+func (h *toolHandler) listLocks() any {
 	locks, err := h.locks.ListLocks()
 	if err != nil {
 		return errResult(err)
@@ -423,7 +428,7 @@ func (h *toolHandler) listLocks() map[string]any {
 			"expires_in_seconds": l.ExpiresInSeconds,
 		})
 	}
-	return map[string]any{"locks": out}
+	return out
 }
 
 func (h *toolHandler) lockResources(ctx context.Context, args map[string]any) map[string]any {
@@ -483,7 +488,10 @@ func (h *toolHandler) getNote(args map[string]any) map[string]any {
 	return noteMap(note)
 }
 
-func (h *toolHandler) listNotes() map[string]any {
+// listNotes returns a bare JSON array of active notes ([{key, value, author?,
+// expires_in_seconds?}, ...]) to match the v1 wire shape; author/expiry are
+// omitted when absent (see noteMap). On error it returns an {"error": ...} map.
+func (h *toolHandler) listNotes() any {
 	notes, err := h.store.ListNotes()
 	if err != nil {
 		return errResult(err)
@@ -492,7 +500,7 @@ func (h *toolHandler) listNotes() map[string]any {
 	for _, n := range notes {
 		out = append(out, noteMap(n))
 	}
-	return map[string]any{"notes": out}
+	return out
 }
 
 func (h *toolHandler) deleteNote(args map[string]any) map[string]any {
@@ -566,7 +574,10 @@ func (h *toolHandler) unregisterAgent(args map[string]any) map[string]any {
 	return map[string]any{"unregistered": true}
 }
 
-func (h *toolHandler) listAgents() map[string]any {
+// listAgents returns a bare JSON array of registered agents ([{agent_id,
+// expires_in_seconds}, ...]), matching the list-tool array convention. On error
+// it returns an {"error": ...} map.
+func (h *toolHandler) listAgents() any {
 	agents, err := h.presence.ListAgents()
 	if err != nil {
 		return errResult(err)
@@ -578,7 +589,7 @@ func (h *toolHandler) listAgents() map[string]any {
 			"expires_in_seconds": a.ExpiresInSeconds,
 		})
 	}
-	return map[string]any{"agents": out}
+	return out
 }
 
 // --- EVENTS ---
@@ -696,7 +707,10 @@ func (h *toolHandler) failTask(args map[string]any) map[string]any {
 	return map[string]any{"failed": failed}
 }
 
-func (h *toolHandler) listTasks(args map[string]any) map[string]any {
+// listTasks returns a bare JSON array of tasks in a queue, matching the
+// list-tool array convention. A missing queue arg or store error returns an
+// {"error": ...} map instead.
+func (h *toolHandler) listTasks(args map[string]any) any {
 	queue := argStr(args, "queue")
 	if queue == "" {
 		return errMissing("queue")
@@ -723,7 +737,7 @@ func (h *toolHandler) listTasks(args map[string]any) map[string]any {
 		}
 		out = append(out, m)
 	}
-	return map[string]any{"tasks": out}
+	return out
 }
 
 // --- shared result helpers ---

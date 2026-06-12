@@ -34,9 +34,11 @@ func newTestHandler(t *testing.T) (*ToolHandler, *store.Store) {
 	return NewToolHandler(lm, pm, em, tm, s), s
 }
 
-// callToolJSON invokes a tool through the full Handle path (tools/call) and
-// returns the decoded tool-result map that rides inside content[0].text.
-func callToolJSON(t *testing.T, h *ToolHandler, name string, args map[string]any) map[string]any {
+// callToolText invokes a tool through the full Handle path (tools/call) and
+// returns the raw JSON string that rides inside content[0].text. This is the
+// exact wire payload an agent receives, so tests can assert its top-level shape
+// (object vs array).
+func callToolText(t *testing.T, h *ToolHandler, name string, args map[string]any) string {
 	t.Helper()
 	params, err := json.Marshal(map[string]any{"name": name, "arguments": args})
 	if err != nil {
@@ -58,9 +60,31 @@ func callToolJSON(t *testing.T, h *ToolHandler, name string, args map[string]any
 	if !ok {
 		t.Fatalf("tools/call %s: content[0].text not a string", name)
 	}
+	return text
+}
+
+// callToolJSON invokes a tool and decodes its content[0].text into a result map.
+// Use this for the tools that return an object; for the list_* tools (which
+// return a bare array) use callToolJSONArray.
+func callToolJSON(t *testing.T, h *ToolHandler, name string, args map[string]any) map[string]any {
+	t.Helper()
+	text := callToolText(t, h, name, args)
 	var out map[string]any
 	if err := json.Unmarshal([]byte(text), &out); err != nil {
-		t.Fatalf("tools/call %s: unmarshal text: %v", name, err)
+		t.Fatalf("tools/call %s: unmarshal text into map: %v (text=%s)", name, err, text)
+	}
+	return out
+}
+
+// callToolJSONArray invokes a tool and decodes its content[0].text into a
+// top-level JSON array. It fails if the payload is not an array, which is what
+// the v1-compatible list_* tools must return.
+func callToolJSONArray(t *testing.T, h *ToolHandler, name string, args map[string]any) []map[string]any {
+	t.Helper()
+	text := callToolText(t, h, name, args)
+	var out []map[string]any
+	if err := json.Unmarshal([]byte(text), &out); err != nil {
+		t.Fatalf("tools/call %s: result is not a top-level JSON array: %v (text=%s)", name, err, text)
 	}
 	return out
 }
@@ -205,10 +229,15 @@ func TestListAndLockMany(t *testing.T) {
 		t.Fatalf("expected tokens for x and y: %v", toks)
 	}
 
-	list := callToolJSON(t, h, "list_locks", map[string]any{})
-	locks := list["locks"].([]any)
+	// list_locks returns a BARE top-level array (v1 wire-compat), not {"locks":...}.
+	locks := callToolJSONArray(t, h, "list_locks", map[string]any{})
 	if len(locks) != 2 {
 		t.Fatalf("expected 2 locks, got %d: %v", len(locks), locks)
+	}
+	for _, l := range locks {
+		if l["name"] == nil || l["agent_id"] != "A" || l["expires_in_seconds"] == nil {
+			t.Fatalf("lock entry missing expected fields: %v", l)
+		}
 	}
 
 	// Contended batch returns locked:false.
@@ -236,9 +265,18 @@ func TestNotes(t *testing.T) {
 		t.Fatalf("get_note absent: %v", miss)
 	}
 
-	list := callToolJSON(t, h, "list_notes", map[string]any{})
-	if len(list["notes"].([]any)) != 1 {
-		t.Fatalf("list_notes: %v", list)
+	// list_notes returns a BARE top-level array (v1 wire-compat), not {"notes":...}.
+	notes := callToolJSONArray(t, h, "list_notes", map[string]any{})
+	if len(notes) != 1 {
+		t.Fatalf("list_notes: %v", notes)
+	}
+	// This note has an author but no TTL: author present, expires_in_seconds omitted.
+	n0 := notes[0]
+	if n0["key"] != "k" || n0["value"] != "v" || n0["author"] != "me" {
+		t.Fatalf("note entry: %v", n0)
+	}
+	if _, ok := n0["expires_in_seconds"]; ok {
+		t.Fatalf("note without TTL must omit expires_in_seconds: %v", n0)
 	}
 
 	// CAS: wrong expected does not swap; correct expected swaps.
@@ -254,6 +292,60 @@ func TestNotes(t *testing.T) {
 	del := callToolJSON(t, h, "delete_note", map[string]any{"key": "k"})
 	if del["deleted"] != true {
 		t.Fatalf("delete_note: %v", del)
+	}
+}
+
+// TestListToolsAreBareArrays pins the v1 wire shape: list_locks and list_notes
+// must serialize as a top-level JSON ARRAY (text starts with '['), NOT an object
+// wrapper like {"locks":...}. It also verifies a note with neither author nor TTL
+// omits both optional keys.
+func TestListToolsAreBareArrays(t *testing.T) {
+	h, _ := newTestHandler(t)
+
+	// Empty lists are still bare arrays ("[]"), never "null" or "{...}".
+	if got := callToolText(t, h, "list_locks", map[string]any{}); got != "[]" {
+		t.Fatalf("empty list_locks text = %q, want []", got)
+	}
+	if got := callToolText(t, h, "list_notes", map[string]any{}); got != "[]" {
+		t.Fatalf("empty list_notes text = %q, want []", got)
+	}
+
+	// A note with no author and no TTL omits both optional keys.
+	callToolJSON(t, h, "set_note", map[string]any{"key": "bare", "value": "v"})
+	notesText := callToolText(t, h, "list_notes", map[string]any{})
+	if len(notesText) == 0 || notesText[0] != '[' {
+		t.Fatalf("list_notes must be a bare array, got %q", notesText)
+	}
+	notes := callToolJSONArray(t, h, "list_notes", map[string]any{})
+	if len(notes) != 1 {
+		t.Fatalf("expected 1 note, got %v", notes)
+	}
+	n := notes[0]
+	if n["key"] != "bare" || n["value"] != "v" {
+		t.Fatalf("note entry: %v", n)
+	}
+	if _, ok := n["author"]; ok {
+		t.Fatalf("note without author must omit author: %v", n)
+	}
+	if _, ok := n["expires_in_seconds"]; ok {
+		t.Fatalf("note without TTL must omit expires_in_seconds: %v", n)
+	}
+
+	// A note WITH a TTL includes expires_in_seconds.
+	callToolJSON(t, h, "set_note", map[string]any{"key": "ttl", "value": "v", "ttl_seconds": float64(60)})
+	for _, n := range callToolJSONArray(t, h, "list_notes", map[string]any{}) {
+		if n["key"] == "ttl" {
+			if _, ok := n["expires_in_seconds"]; !ok {
+				t.Fatalf("note with TTL must include expires_in_seconds: %v", n)
+			}
+		}
+	}
+
+	// list_locks entries always carry expires_in_seconds.
+	callToolJSON(t, h, "lock_resource", map[string]any{"name": "L", "agent_id": "A"})
+	locks := callToolJSONArray(t, h, "list_locks", map[string]any{})
+	if len(locks) != 1 || locks[0]["expires_in_seconds"] == nil {
+		t.Fatalf("list_locks entry must carry expires_in_seconds: %v", locks)
 	}
 }
 
@@ -275,17 +367,18 @@ func TestPresence(t *testing.T) {
 	if reg["registered"] != true || reg["expires_in_seconds"].(float64) != 60 {
 		t.Fatalf("register_agent: %v", reg)
 	}
-	list := callToolJSON(t, h, "list_agents", map[string]any{})
-	if len(list["agents"].([]any)) != 1 {
-		t.Fatalf("list_agents: %v", list)
+	// list_agents returns a BARE top-level array.
+	agents := callToolJSONArray(t, h, "list_agents", map[string]any{})
+	if len(agents) != 1 {
+		t.Fatalf("list_agents: %v", agents)
 	}
 	un := callToolJSON(t, h, "unregister_agent", map[string]any{"agent_id": "A"})
 	if un["unregistered"] != true {
 		t.Fatalf("unregister_agent: %v", un)
 	}
-	list2 := callToolJSON(t, h, "list_agents", map[string]any{})
-	if len(list2["agents"].([]any)) != 0 {
-		t.Fatalf("list_agents after unregister: %v", list2)
+	agents2 := callToolJSONArray(t, h, "list_agents", map[string]any{})
+	if len(agents2) != 0 {
+		t.Fatalf("list_agents after unregister: %v", agents2)
 	}
 }
 
@@ -337,13 +430,12 @@ func TestTasks(t *testing.T) {
 	}
 	leaseToken := claim["lease_token"].(string)
 
-	// list_tasks shows the claimed task with its lease agent.
-	list := callToolJSON(t, h, "list_tasks", map[string]any{"queue": "q"})
-	tasks := list["tasks"].([]any)
+	// list_tasks returns a BARE top-level array; entry shows the claimed task.
+	tasks := callToolJSONArray(t, h, "list_tasks", map[string]any{"queue": "q"})
 	if len(tasks) != 1 {
 		t.Fatalf("list_tasks: %v", tasks)
 	}
-	tm := tasks[0].(map[string]any)
+	tm := tasks[0]
 	if tm["state"] != "claimed" || tm["lease_agent"] != "A" {
 		t.Fatalf("list_tasks claimed entry: %v", tm)
 	}
