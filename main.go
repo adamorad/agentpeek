@@ -4,17 +4,24 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"syscall"
+	"time"
 
 	"github.com/adamorad/airlock/internal/cli"
 	"github.com/adamorad/airlock/internal/mcp"
+	"github.com/adamorad/airlock/internal/service"
 	"github.com/adamorad/airlock/internal/store"
 	"github.com/adamorad/airlock/internal/version"
 )
@@ -45,7 +52,16 @@ func run(args []string) int {
 	case "watch":
 		return cli.Watch(resolveDBPath(""))
 	case "install-service":
-		fmt.Println("install-service: not yet implemented")
+		if err := service.Install(); err != nil {
+			fmt.Fprintf(os.Stderr, "%s: install-service: %v\n", version.Name, err)
+			return 1
+		}
+		return 0
+	case "uninstall-service":
+		if err := service.Uninstall(); err != nil {
+			fmt.Fprintf(os.Stderr, "%s: uninstall-service: %v\n", version.Name, err)
+			return 1
+		}
 		return 0
 	case "version", "--version", "-v":
 		fmt.Printf("%s %s\n", version.Name, version.Number)
@@ -114,10 +130,75 @@ func runDaemon(args []string) int {
 	}
 
 	if err := srv.Start(ctx); err != nil {
+		if isAddrInUse(err) {
+			return reportPortInUse(defaultAddr)
+		}
 		fmt.Fprintf(os.Stderr, "%s: serve: %v\n", version.Name, err)
 		return 1
 	}
 	return 0
+}
+
+// isAddrInUse reports whether err is an "address already in use" bind failure.
+// It checks the typed syscall errno first, then falls back to a string match
+// for wrapped errors that lose the errno.
+func isAddrInUse(err error) bool {
+	if errors.Is(err, syscall.EADDRINUSE) {
+		return true
+	}
+	return strings.Contains(err.Error(), "address already in use")
+}
+
+// reportPortInUse prints a diagnostic when the daemon cannot bind because the
+// port is taken. If another airlock-speaking server already owns the port it
+// identifies it by name and tells the user how to stop it; otherwise it prints
+// a generic message. It always returns exit code 1.
+func reportPortInUse(addr string) int {
+	if name, ok := probeDaemon(addr); ok {
+		fmt.Fprintf(os.Stderr,
+			"%s cannot start: %s is already serving %q. Stop it first — "+
+				"launchctl unload ~/Library/LaunchAgents/com.airlock.daemon.plist  (macOS)  or  "+
+				"systemctl --user stop airlock  (Linux).\n",
+			version.Name, addr, name)
+		return 1
+	}
+	fmt.Fprintf(os.Stderr, "%s cannot start: port 27183 in use by another process.\n", version.Name)
+	return 1
+}
+
+// probeDaemon POSTs a JSON-RPC initialize to http://addr/ and, if the response
+// carries a serverInfo.name, returns that name and ok=true. Anything else (no
+// listener, non-JSON, missing field) yields ok=false. It uses a 2s timeout so a
+// dead or wedged port cannot hang daemon startup.
+func probeDaemon(addr string) (name string, ok bool) {
+	body := []byte(`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}`)
+	req, err := http.NewRequest(http.MethodPost, "http://"+addr+"/", bytes.NewReader(body))
+	if err != nil {
+		return "", false
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{Timeout: 2 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", false
+	}
+	defer resp.Body.Close()
+
+	var env struct {
+		Result struct {
+			ServerInfo struct {
+				Name string `json:"name"`
+			} `json:"serverInfo"`
+		} `json:"result"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&env); err != nil {
+		return "", false
+	}
+	if env.Result.ServerInfo.Name == "" {
+		return "", false
+	}
+	return env.Result.ServerInfo.Name, true
 }
 
 // tokenFilePath returns the path to the bearer-token file (~/.airlock/token),
@@ -157,7 +238,8 @@ Usage:
   %s status                   print current port state
   %s watch                    stream live port activity
   %s install-service          install the background service
+  %s uninstall-service        remove the background service
   %s version                  print version
 
-`, version.Name, version.Number, version.Name, version.Name, version.Name, version.Name, version.Name)
+`, version.Name, version.Number, version.Name, version.Name, version.Name, version.Name, version.Name, version.Name)
 }
