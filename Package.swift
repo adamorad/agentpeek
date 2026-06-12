@@ -5,9 +5,7 @@ let package = Package(
     name: "agentpeek",
     platforms: [.macOS(.v13)],
     targets: [
-        .executableTarget(
-            name: "agentpeek",
-            path: "Sources/agentpeek"
-        )
+        .executableTarget(name: "agentpeek", path: "Sources/agentpeek"),
+        .testTarget(name: "agentpeekTests", dependencies: ["agentpeek"], path: "Tests/agentpeekTests")
     ]
 )

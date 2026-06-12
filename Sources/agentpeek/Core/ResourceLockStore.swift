@@ -19,8 +19,12 @@ final class ResourceLockStore {
     private let queue = DispatchQueue(label: "com.agentpeek.locks")
     private var locks: [String: ResourceLock] = [:]
     private let defaultsKey = "agentpeek.locks"
+    private let defaults: UserDefaults
 
-    init() { load() }
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        load()
+    }
 
     func lock(name: String, agentId: String, ttlMinutes: Int) throws {
         guard ttlMinutes > 0 else { return }
@@ -79,11 +83,11 @@ final class ResourceLockStore {
 
     private func save() {
         let data = try? JSONEncoder().encode(locks)
-        UserDefaults.standard.set(data, forKey: defaultsKey)
+        defaults.set(data, forKey: defaultsKey)
     }
 
     private func load() {
-        guard let data = UserDefaults.standard.data(forKey: defaultsKey),
+        guard let data = defaults.data(forKey: defaultsKey),
               let decoded = try? JSONDecoder().decode([String: ResourceLock].self, from: data) else { return }
         locks = decoded
     }
