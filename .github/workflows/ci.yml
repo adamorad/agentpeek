@@ -1,36 +1,17 @@
 name: CI
 on:
-  push: { branches: [main] }
+  push: { branches: [v2, main] }
   pull_request:
 jobs:
-  build-test-smoke:
-    runs-on: macos-14
+  test:
+    strategy:
+      matrix:
+        os: [macos-14, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Build
-        run: swift build -c release
-      - name: Unit tests
-        run: swift test
-      - name: Integration smoke
-        run: |
-          trap 'kill %1 2>/dev/null || true' EXIT
-          AIRLOCK_DEFAULTS_SUITE="ci.airlock.$RANDOM" .build/release/airlock &
-          for i in $(seq 1 30); do
-            curl -s -o /dev/null http://127.0.0.1:27183/ -X POST -H 'Content-Type: application/json' -d '{}' && break
-            sleep 0.5
-          done
-          nc -z 127.0.0.1 27183 || { echo 'daemon never bound'; exit 1; }
-          call() { curl -s -X POST http://127.0.0.1:27183/ -H "Content-Type: application/json" -d "$1"; }
-          code() { curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:27183/ "$@"; }
-          call '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | grep -q '"airlock"'
-          call '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' | grep -q 'lock_resource'
-          # Tool results are JSON-encoded inside MCP content text, so inner quotes are escaped (\").
-          call '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"lock_resource","arguments":{"name":"ci","agent_id":"A","ttl_minutes":1}}}' | grep -qF '\"locked\":true'
-          call '{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"lock_resource","arguments":{"name":"ci","agent_id":"B","ttl_minutes":1}}}' | grep -qF '\"locked\":false'
-          call '{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"unlock_resource","arguments":{"name":"ci","agent_id":"A"}}}' | grep -qF '\"released\":true'
-          call '{"jsonrpc":"2.0","id":6,"method":"tools/call","params":{"name":"set_note","arguments":{"key":"k","value":"v"}}}' | grep -qF '\"saved\":true'
-          call '{"jsonrpc":"2.0","id":7,"method":"tools/call","params":{"name":"get_note","arguments":{"key":"k"}}}' | grep -qF '\"value\":\"v\"'
-          # security posture — must NOT return 200
-          test "$(code -H 'Content-Type: application/json' -H 'Host: evil.com:27183' -d '{}')" != "200"
-          test "$(code -H 'Content-Type: application/json' -H 'Origin: http://evil.com' -d '{}')" != "200"
-          test "$(code -H 'Content-Type: text/plain' -d '{}')" != "200"
+      - uses: actions/setup-go@v5
+        with: { go-version: '1.23' }
+      - run: go vet ./...
+      - run: go build ./...
+      - run: go test ./... -count=1
