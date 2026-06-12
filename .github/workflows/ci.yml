@@ -15,3 +15,116 @@ jobs:
       - run: go vet ./...
       - run: go build ./...
       - run: go test ./... -count=1
+      - name: Integration smoke
+        run: |
+          # Build the daemon and start it against a throwaway DB with a fixed
+          # token so behaviour is identical on macOS and Linux.
+          go build -o airlock .
+          export AIRLOCK_TOKEN=citoken
+          export AIRLOCK_DB="$(mktemp -u)"   # path that does not exist yet
+
+          # Always reap the daemon when the step exits.
+          trap 'kill %1 2>/dev/null || true' EXIT
+          ./airlock daemon &
+
+          # Readiness poll: wait for the loopback listener (up to ~7.5s).
+          ready=0
+          for i in $(seq 1 15); do
+            if curl -s -o /dev/null "http://127.0.0.1:27183/healthz"; then
+              ready=1
+              break
+            fi
+            sleep 0.5
+          done
+          if [ "$ready" -ne 1 ]; then
+            echo "FAIL: daemon never bound 127.0.0.1:27183" >&2
+            exit 1
+          fi
+
+          # Request helpers. Use explicit IPv4 so curl never tries ::1 on Linux.
+          A=(-H "Content-Type: application/json" -H "Authorization: Bearer citoken")
+          call(){ curl -s "${A[@]}" -X POST http://127.0.0.1:27183/ -d "$1"; }
+          code(){ curl -s -o /dev/null -w '%{http_code}' "$@" -X POST http://127.0.0.1:27183/; }
+
+          # ---------------------------------------------------------------
+          # Functional assertions (set -e fails the step on any failure).
+          # tools/call returns the tool result JSON-ENCODED inside
+          # result.content[0].text, so JSON quotes are escaped on the wire —
+          # match the escaped form with `grep -qF`.
+          # ---------------------------------------------------------------
+
+          # initialize → serverInfo.name == "airlock"
+          call '{"jsonrpc":"2.0","id":1,"method":"initialize"}' | grep -qF '"airlock"'
+
+          # tools/list → proves v1 + v2 tools are registered.
+          TL=$(call '{"jsonrpc":"2.0","id":2,"method":"tools/list"}')
+          echo "$TL" | grep -qF 'lock_resource'
+          echo "$TL" | grep -qF 'increment_counter'
+          echo "$TL" | grep -qF 'signal_event'
+          echo "$TL" | grep -qF 'claim_next_task'
+
+          # lock_resource A → locked:true
+          call '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"lock_resource","arguments":{"name":"ci","agent_id":"A"}}}' | grep -qF '\"locked\":true'
+
+          # lock_resource B (no wait) → locked:false, held_by:A
+          RB=$(call '{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"lock_resource","arguments":{"name":"ci","agent_id":"B","wait_seconds":0}}}')
+          echo "$RB" | grep -qF '\"locked\":false'
+          echo "$RB" | grep -qF '\"held_by\":\"A\"'
+
+          # unlock_resource A → released:true
+          call '{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"unlock_resource","arguments":{"name":"ci","agent_id":"A"}}}' | grep -qF '\"released\":true'
+
+          # set_note / get_note round-trip
+          call '{"jsonrpc":"2.0","id":6,"method":"tools/call","params":{"name":"set_note","arguments":{"key":"k","value":"v"}}}' | grep -qF '\"saved\":true'
+          call '{"jsonrpc":"2.0","id":7,"method":"tools/call","params":{"name":"get_note","arguments":{"key":"k"}}}' | grep -qF '\"value\":\"v\"'
+
+          # increment_counter by 2, twice → value:4
+          call '{"jsonrpc":"2.0","id":8,"method":"tools/call","params":{"name":"increment_counter","arguments":{"name":"c","by":2}}}' >/dev/null
+          call '{"jsonrpc":"2.0","id":9,"method":"tools/call","params":{"name":"increment_counter","arguments":{"name":"c","by":2}}}' | grep -qF '\"value\":4'
+
+          # set_note_if (compare-and-swap) → swapped:true
+          call '{"jsonrpc":"2.0","id":10,"method":"tools/call","params":{"name":"set_note_if","arguments":{"key":"k","expected_value":"v","new_value":"v2"}}}' | grep -qF '\"swapped\":true'
+
+          # register_agent / list_agents
+          call '{"jsonrpc":"2.0","id":11,"method":"tools/call","params":{"name":"register_agent","arguments":{"agent_id":"A","ttl_seconds":60}}}' | grep -qF '\"registered\":true'
+          call '{"jsonrpc":"2.0","id":12,"method":"tools/call","params":{"name":"list_agents","arguments":{}}}' | grep -qF 'A'
+
+          # signal_event / wait_for_event
+          call '{"jsonrpc":"2.0","id":13,"method":"tools/call","params":{"name":"signal_event","arguments":{"name":"e"}}}' | grep -qF '\"generation\":1'
+          call '{"jsonrpc":"2.0","id":14,"method":"tools/call","params":{"name":"wait_for_event","arguments":{"name":"e","last_seen_generation":0,"wait_seconds":1}}}' | grep -qF '\"fired\":true'
+
+          # push_task / claim_next_task
+          call '{"jsonrpc":"2.0","id":15,"method":"tools/call","params":{"name":"push_task","arguments":{"queue":"q","payload":"p"}}}' | grep -qF '\"id\":'
+          call '{"jsonrpc":"2.0","id":16,"method":"tools/call","params":{"name":"claim_next_task","arguments":{"queue":"q","agent_id":"A"}}}' | grep -qF '\"claimed\":true'
+
+          # ---------------------------------------------------------------
+          # Security assertions (each must be NON-200).
+          # Host is checked before token, so a bad Host still 403s even with a
+          # valid Authorization header.
+          # ---------------------------------------------------------------
+
+          # Bad Host → 403 (DNS-rebinding defence).
+          [ "$(code "${A[@]}" -H 'Host: evil.com:27183' -d '{}')" != "200" ]
+          # Origin header present → 403 (no legit local MCP client sends Origin).
+          [ "$(code "${A[@]}" -H 'Origin: http://evil.com' -d '{}')" != "200" ]
+          # Wrong Content-Type → 415.
+          [ "$(code -H 'Content-Type: text/plain' -H 'Authorization: Bearer citoken' -d '{}')" != "200" ]
+          # Missing token (when token is set) → 401.
+          [ "$(code -H 'Content-Type: application/json' -d '{}')" != "200" ]
+
+          echo "SMOKE PASSED"
+
+  cross-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version: '1.23' }
+      - name: Cross-compile (pure-Go SQLite, CGO disabled)
+        run: |
+          # modernc.org/sqlite is pure Go, so CGO_ENABLED=0 must build for every
+          # supported target. A failure here means a cgo dependency crept in.
+          for t in darwin/arm64 darwin/amd64 linux/arm64 linux/amd64; do
+            echo "building $t"
+            GOOS=${t%/*} GOARCH=${t#*/} CGO_ENABLED=0 go build -o /dev/null . || exit 1
+          done
