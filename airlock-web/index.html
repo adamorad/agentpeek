@@ -5,17 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0a0a12" />
     <title>Airlock — Stop your AI agents from stepping on each other</title>
-    <meta name="description" content="A native macOS daemon with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts." />
+    <meta name="description" content="A native daemon for macOS and Linux with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts." />
 
     <!-- Open Graph -->
     <meta property="og:type"        content="website" />
     <meta property="og:title"       content="Airlock — Stop your AI agents from stepping on each other" />
-    <meta property="og:description" content="A native macOS daemon with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts." />
+    <meta property="og:description" content="A native daemon for macOS and Linux with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts." />
 
     <!-- Twitter / X -->
     <meta name="twitter:card"        content="summary_large_image" />
     <meta name="twitter:title"       content="Airlock — Stop your AI agents from stepping on each other" />
-    <meta name="twitter:description" content="A native macOS daemon with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts." />
+    <meta name="twitter:description" content="A native daemon for macOS and Linux with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts." />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -42,7 +42,7 @@
             Your agents are stepping on each other.
             <span class="hero-accent">Airlock fixes that.</span>
           </h1>
-          <p class="tagline">A native macOS daemon with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts.</p>
+          <p class="tagline">A native daemon for macOS and Linux with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts.</p>
         </div>
 
         <!-- Install command -->
@@ -321,7 +321,7 @@
       </div>
 
       <a class="scroll-indicator" href="#tools" aria-label="Jump to MCP tools">
-        See the 7 MCP tools <span class="scroll-arrow" aria-hidden="true">↓</span>
+        See the 22 MCP tools <span class="scroll-arrow" aria-hidden="true">↓</span>
       </a>
     </section>
 
@@ -330,9 +330,9 @@
       <div class="fold2-inner">
 
         <div class="fold2-header">
-          <span class="fold2-label">7 MCP Tools</span>
+          <span class="fold2-label">22 MCP Tools</span>
           <h2 class="fold2-headline">Everything agents need to coordinate.</h2>
-          <p class="fold2-sub">All tools available on <code style="font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(167,139,250,0.8)">127.0.0.1:27183</code> — any MCP-compatible agent, one shared daemon.</p>
+          <p class="fold2-sub">Five groups — Locks, Notes &amp; atomic state, Presence, Events, and Tasks — all on <code style="font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(167,139,250,0.8)">127.0.0.1:27183</code>. Any MCP-compatible agent, one shared daemon.</p>
         </div>
 
         <!-- Tool groups -->
@@ -345,15 +345,48 @@
               <span class="tool-pill">unlock_resource</span>
               <span class="tool-pill">renew_lock</span>
               <span class="tool-pill">list_locks</span>
+              <span class="tool-pill">lock_resources</span>
             </div>
           </div>
 
           <div class="tool-group" role="listitem">
-            <span class="tool-group-label">Scratchpad</span>
+            <span class="tool-group-label">Notes &amp; State</span>
             <div class="tool-pills">
               <span class="tool-pill">set_note</span>
               <span class="tool-pill">get_note</span>
               <span class="tool-pill">list_notes</span>
+              <span class="tool-pill">delete_note</span>
+              <span class="tool-pill">set_note_if</span>
+              <span class="tool-pill">increment_counter</span>
+            </div>
+          </div>
+
+          <div class="tool-group" role="listitem">
+            <span class="tool-group-label">Presence</span>
+            <div class="tool-pills">
+              <span class="tool-pill">register_agent</span>
+              <span class="tool-pill">unregister_agent</span>
+              <span class="tool-pill">list_agents</span>
+            </div>
+          </div>
+
+          <div class="tool-group" role="listitem">
+            <span class="tool-group-label">Events</span>
+            <div class="tool-pills">
+              <span class="tool-pill">signal_event</span>
+              <span class="tool-pill">wait_for_event</span>
+              <span class="tool-pill">clear_event</span>
+            </div>
+          </div>
+
+          <div class="tool-group" role="listitem">
+            <span class="tool-group-label">Tasks</span>
+            <div class="tool-pills">
+              <span class="tool-pill">push_task</span>
+              <span class="tool-pill">claim_next_task</span>
+              <span class="tool-pill">complete_task</span>
+              <span class="tool-pill">fail_task</span>
+              <span class="tool-pill">list_tasks</span>
             </div>
           </div>
 
@@ -366,9 +399,9 @@
           <div class="step-card">
             <div class="step-card-header">
               <div class="step-num" aria-hidden="true">1</div>
-              <p class="step-title">Install via Homebrew</p>
+              <p class="step-title">Install</p>
             </div>
-            <p class="step-desc">Installs the binary and places the LaunchAgent plist on your system.</p>
+            <p class="step-desc">Homebrew on macOS or Linux. Or build from source with <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:4px">go install github.com/adamorad/airlock/v2@latest</code>.</p>
             <div class="config-row">
               <code id="step1-cmd">brew install adamorad/tap/airlock</code>
               <button class="copy-btn" data-copy="step1-cmd" aria-label="Copy install command">Copy</button>
@@ -379,12 +412,12 @@
           <div class="step-card">
             <div class="step-card-header">
               <div class="step-num" aria-hidden="true">2</div>
-              <p class="step-title">Load daemon</p>
+              <p class="step-title">Start the daemon</p>
             </div>
-            <p class="step-desc">Register with launchd so Airlock starts automatically at login.</p>
+            <p class="step-desc">Registers the service so Airlock starts at login — launchd on macOS, systemd on Linux.</p>
             <div class="config-row">
-              <code id="step2-cmd">cp $(brew --prefix)/share/airlock/com.airlock.daemon.plist ~/Library/LaunchAgents/ &amp;&amp; launchctl load ~/Library/LaunchAgents/com.airlock.daemon.plist</code>
-              <button class="copy-btn" data-copy="step2-cmd" aria-label="Copy launchd command">Copy</button>
+              <code id="step2-cmd">airlock install-service</code>
+              <button class="copy-btn" data-copy="step2-cmd" aria-label="Copy install-service command">Copy</button>
             </div>
           </div>
 
@@ -392,19 +425,19 @@
           <div class="step-card">
             <div class="step-card-header">
               <div class="step-num" aria-hidden="true">3</div>
-              <p class="step-title">Configure agent</p>
+              <p class="step-title">Configure your agent</p>
             </div>
-            <p class="step-desc">Add to <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:4px">~/.claude/mcp_servers.json</code></p>
+            <p class="step-desc">Point any MCP-compatible agent at the daemon. On Linux, add a bearer token from <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:4px">~/.airlock/token</code>.</p>
             <div class="config-row">
-              <pre id="step3-cmd">{"airlock": {"transport": "http", "url": "http://127.0.0.1:27183"}}</pre>
-              <button class="copy-btn" data-copy="step3-cmd" aria-label="Copy MCP config JSON">Copy</button>
+              <code id="step3-cmd">claude mcp add --transport http airlock http://localhost:27183</code>
+              <button class="copy-btn" data-copy="step3-cmd" aria-label="Copy MCP add command">Copy</button>
             </div>
           </div>
 
         </div><!-- /setup-steps -->
 
         <div class="roadmap-teaser">
-          v2 in design: blocking waits · atomic counters · Linux — <a href="https://github.com/adamorad/airlock/blob/main/docs/ROADMAP-v2.md" target="_blank" rel="noopener">read the roadmap →</a>
+          v2.0 shipped: blocking waits · atomic counters · cross-platform — <a href="https://github.com/adamorad/airlock/releases" target="_blank" rel="noopener">see the changelog →</a>
         </div>
 
       </div>
