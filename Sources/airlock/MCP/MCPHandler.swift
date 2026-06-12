@@ -23,7 +23,7 @@ final class MCPHandler {
             return try successResponse(id: id, result: [
                 "protocolVersion": "2024-11-05",
                 "capabilities": ["tools": [:]],
-                "serverInfo": ["name": "agentpeek", "version": "1.0.0"]
+                "serverInfo": ["name": "airlock", "version": "1.0.0"]
             ])
 
         case "tools/list":

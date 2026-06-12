@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- CI smoke hardened: hermetic UserDefaults via `AGENTPEEK_DEFAULTS_SUITE` env var, readiness poll instead of fixed sleep, daemon teardown on exit.
+- CI smoke hardened: hermetic UserDefaults via `AIRLOCK_DEFAULTS_SUITE` env var, readiness poll instead of fixed sleep, daemon teardown on exit.
 - Added `NoteStore` unit tests (roundtrip, expiry, delete, persistence).
 
 ## 1.0.0 — 2026-06-12

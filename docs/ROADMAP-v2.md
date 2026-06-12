@@ -1,4 +1,4 @@
-# AgentPeek v2 — The Coordination Layer for AI Agents
+# Airlock v2 — The Coordination Layer for AI Agents
 
 > Status: public roadmap. v2 is design-only right now — this document is the roadmap and the design rationale. v1 (this repo) is shipped and supported; v2 is the next-generation design described below.
 > Last updated: 2026-06-12.
@@ -9,9 +9,9 @@
 
 **Run five agents on one repo without them stomping on each other.**
 
-AgentPeek is the always-on coordination daemon that outlives every session — the missing syscall layer (mutexes, signals, shared state) for AI agents. Operating systems gave processes mutexes, semaphores, signals, and shared memory so that concurrent work could be correct. AI agents have none of that: each session is an island that spins up, acts on a shared filesystem, and dies. AgentPeek is the small, boring, always-running piece that gives a fleet of agents the primitives an OS gives a fleet of processes.
+Airlock is the always-on coordination daemon that outlives every session — the missing syscall layer (mutexes, signals, shared state) for AI agents. Operating systems gave processes mutexes, semaphores, signals, and shared memory so that concurrent work could be correct. AI agents have none of that: each session is an island that spins up, acts on a shared filesystem, and dies. Airlock is the small, boring, always-running piece that gives a fleet of agents the primitives an OS gives a fleet of processes.
 
-Picture the north star concretely. Two Claude Code sessions, one Cursor agent, and one CI script are all working on the same repository at the same time. All four need to run database migrations, but migrations must not run concurrently — so each one calls `lock_resource("migrations")` and the daemon serializes them: the first holder runs, the rest block on lock waits and wake the instant it releases, no busy-polling and no agent-authored retry loops. Each agent that needs a scratch file calls `increment_counter("scratch-seq")` and gets a unique number back, so filenames never collide even under a dead heat. When the first agent finishes the schema work it calls `signal_event("migrations-done")`; Agent B, which has been parked in `wait_for_event("migrations-done")`, wakes the instant the signal fires and begins the dependent work — not a second of polling latency. And the developer, watching all of it happen live, runs `agentpeek status` in a terminal and sees exactly which agent holds which lock, who is queued behind it, and what each agent last signaled. Coordination that used to live in fragile prompt instructions ("please wait until migrations are done") becomes a real, observable, race-free system primitive.
+Picture the north star concretely. Two Claude Code sessions, one Cursor agent, and one CI script are all working on the same repository at the same time. All four need to run database migrations, but migrations must not run concurrently — so each one calls `lock_resource("migrations")` and the daemon serializes them: the first holder runs, the rest block on lock waits and wake the instant it releases, no busy-polling and no agent-authored retry loops. Each agent that needs a scratch file calls `increment_counter("scratch-seq")` and gets a unique number back, so filenames never collide even under a dead heat. When the first agent finishes the schema work it calls `signal_event("migrations-done")`; Agent B, which has been parked in `wait_for_event("migrations-done")`, wakes the instant the signal fires and begins the dependent work — not a second of polling latency. And the developer, watching all of it happen live, runs `airlock status` in a terminal and sees exactly which agent holds which lock, who is queued behind it, and what each agent last signaled. Coordination that used to live in fragile prompt instructions ("please wait until migrations are done") becomes a real, observable, race-free system primitive.
 
 ---
 
@@ -24,14 +24,14 @@ Picture the north star concretely. Two Claude Code sessions, one Cursor agent, a
 | **G3** | Cross-platform | A single smoke script passes unchanged on macOS arm64 and Ubuntu x86_64. |
 | **G4** | Zero-dep install | A fresh machine reaches a working daemon in ≤2 commands, with no language runtime to install. |
 | **G5** | Backward compatible | Every v1 call works unchanged on v2 — same port (27183), same JSON request and response shapes. |
-| **G6** | Visible | "What are my agents doing?" is answered in ≤2s via `agentpeek status`. |
+| **G6** | Visible | "What are my agents doing?" is answered in ≤2s via `airlock status`. |
 | **G7** | Secure by construction | `release`/`renew` of a lock is **impossible** without the capability token returned by `acquire`; provenance is not authorization. |
 
 ---
 
 ## §3 Landscape
 
-How AgentPeek v2 compares to adjacent tools, **as of June 2026**. Columns: locks · blocking waits · task queue · atomic state · always-on daemon · zero deps · cross-platform · auth.
+How Airlock v2 compares to adjacent tools, **as of June 2026**. Columns: locks · blocking waits · task queue · atomic state · always-on daemon · zero deps · cross-platform · auth.
 
 | Tool | locks | blocking waits | task queue | atomic state | always-on daemon | zero deps | cross-platform | auth |
 |------|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
@@ -42,17 +42,17 @@ How AgentPeek v2 compares to adjacent tools, **as of June 2026**. Columns: locks
 | [mem0](https://github.com/mem0ai/mem0) / [engram](https://github.com/) / [mcp-server-memory](https://github.com/) — memory ≠ real-time coordination | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
 | Redis + scripts — capable, but no MCP surface, real setup burden | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
 | `flock` / lockfiles — no TTL, crash-deadlocks, invisible to agents | ✅ | partial | ❌ | ❌ | ❌ | ✅ | partial | ❌ |
-| **AgentPeek v2** | ✅ | ✅ | ✅ (v2.1) | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Airlock v2** | ✅ | ✅ | ✅ (v2.1) | ✅ | ✅ | ✅ | ✅ | ✅ |
 
-A2A is a messaging standard for how agents *talk to each other*; it is not coordination infrastructure, and AgentPeek sits **below** it — A2A is the conversation, AgentPeek is the shared arbiter the conversing agents both lean on.
+A2A is a messaging standard for how agents *talk to each other*; it is not coordination infrastructure, and Airlock sits **below** it — A2A is the conversation, Airlock is the shared arbiter the conversing agents both lean on.
 
-**The unoccupied quadrant.** No existing tool combines *always-on* + *blocking waits* + *zero-dep* + *MCP-native* + *token-secured* coordination. Redis has the semantics but no MCP surface and a real install. The MCP-native tools are session-scoped — they die with the session that spawned them, which is exactly wrong for a coordination layer whose entire job is to outlive any single agent and hold the shared state every agent depends on. AgentPeek v2 takes that quadrant.
+**The unoccupied quadrant.** No existing tool combines *always-on* + *blocking waits* + *zero-dep* + *MCP-native* + *token-secured* coordination. Redis has the semantics but no MCP surface and a real install. The MCP-native tools are session-scoped — they die with the session that spawned them, which is exactly wrong for a coordination layer whose entire job is to outlive any single agent and hold the shared state every agent depends on. Airlock v2 takes that quadrant.
 
 ---
 
 ## §4 What v1 got wrong
 
-AgentPeek v1 shipped and proved the concept. Six things it got wrong, each of which drives a requirement in §5:
+Airlock v1 shipped and proved the concept. Six things it got wrong, each of which drives a requirement in §5:
 
 1. **Polling-only locks.** A contended `lock_resource` returns `{locked:false, held_by}` immediately and the agent has to author its own retry loop in the prompt. That is fragile, latency-heavy, and pushes coordination logic into every agent. → **R1**.
 2. **UserDefaults is non-transactional.** State lives in macOS `UserDefaults`, which has no transactions and no atomic read-modify-write. Concurrent writers can lose updates. → **R2, R3**.
@@ -80,7 +80,7 @@ Behavior:
 
 ### R2 — Durable, transactional store (→ G2)
 
-State lives in **SQLite in WAL mode** at `~/.agentpeek/state.db`. WAL gives concurrent readers alongside a single writer and crash-safe durability. Replaces UserDefaults entirely.
+State lives in **SQLite in WAL mode** at `~/.airlock/state.db`. WAL gives concurrent readers alongside a single writer and crash-safe durability. Replaces UserDefaults entirely.
 
 ### R3 — Atomic state operations (→ G2)
 
@@ -126,16 +126,16 @@ Events are **generation-counted**, not latched:
 
 ### R8 — Observability (→ G6)
 
-- `agentpeek status` — one-shot snapshot: locks (holder, queue depth), notes, counters, present agents, recent events. ≤2s.
-- `agentpeek watch` — live-updating TUI of the same.
-- Optional `agentpeek --dashboard` serving a read-only web view at `/dashboard`.
+- `airlock status` — one-shot snapshot: locks (holder, queue depth), notes, counters, present agents, recent events. ≤2s.
+- `airlock watch` — live-updating TUI of the same.
+- Optional `airlock --dashboard` serving a read-only web view at `/dashboard`.
 
 ### R9 — Hardened local security (→ G7)
 
 Keeps the entire v1 posture and adds to it:
 
 - **v1 posture retained:** loopback-only bind (`127.0.0.1`), `Host` header allowlist, reject any `Origin` header, require `application/json` Content-Type on POST.
-- **Token file on multi-user systems.** On Linux / multi-user hosts, loopback is shared across *all* users, so loopback alone is not an authorization boundary. A `0600`-permissioned token at `~/.agentpeek/token` is **required** there; clients must present it.
+- **Token file on multi-user systems.** On Linux / multi-user hosts, loopback is shared across *all* users, so loopback alone is not an authorization boundary. A `0600`-permissioned token at `~/.airlock/token` is **required** there; clients must present it.
 - **Resource limits** (anti-DoS, anti-wedge): max parked waiters per lock, max (locks + notes) per agent, payload size caps, queue depth caps.
 - **Mandatory provenance** on notes and tasks: every note/task records writer `agent_id` + timestamp. Note content is a **cross-agent prompt-injection channel** — a consuming agent must treat note/task content as *data, never instructions*. The daemon records who wrote it so consumers can reason about trust; it does not and cannot sanitize the content's meaning.
 
@@ -205,7 +205,7 @@ Naming and parameters here are the contract referenced by §7. **24 tools** acro
 
 A claim is a lease bound to the claimant's presence TTL (R5/R10); presence expiry auto-requeues the task.
 
-### Appendix: v1 compatibility (transcribed from `Sources/agentpeek/MCP/MCPTools.swift`)
+### Appendix: v1 compatibility (transcribed from `Sources/airlock/MCP/MCPTools.swift`)
 
 Every v1 tool keeps working **unchanged** on the same port (27183) with the same JSON. The exact v1 contract, transcribed from source (not memory):
 
@@ -239,7 +239,7 @@ A single Go daemon, one process, listening on `127.0.0.1:27183`.
 
 **Background reaper.** A background goroutine sweeps for expired lock TTLs and expired presence leases. On either, it **wakes the FIFO head** for the affected resource(s). Crucially, **lock release is not the only wake source**: a crashed holder whose TTL lapses, or whose presence lease expires, triggers a reaper wake — so waiters behind a dead agent do not eat their full `wait_seconds`. This is what makes R1's "abandoned waiters expire after 2× TTL" and R5's "expiry wakes waiters immediately" real.
 
-**Schema sketch** (`~/.agentpeek/state.db`, WAL):
+**Schema sketch** (`~/.airlock/state.db`, WAL):
 
 - `locks(name PK, agent_id, lock_token, acquired_at, expires_at)`
 - `lock_waiters(wake_token PK, name, agent_id, enqueued_at, expires_at)` — FIFO order by `enqueued_at`
@@ -249,11 +249,11 @@ A single Go daemon, one process, listening on `127.0.0.1:27183`.
 - `events(name PK, generation, last_signaled_by, last_signaled_at)`
 - `tasks(task_id PK, queue, payload, state, claimant NULL, task_token NULL, lease_expires_at NULL, created_at)` — **v2.1**
 
-**Port-27183 handover from v1.** `agentpeek install-service` **unloads the v1 LaunchAgent before binding** so the v2 daemon takes the port cleanly. If the daemon hits `EADDRINUSE` on startup, it **probes the occupant**: it sends an MCP `initialize` and, if it gets a **v1-shaped** response, prints the exact fix (the command to unload the old LaunchAgent / stop the old daemon and retry) rather than a bare "address in use."
+**Port-27183 handover from v1.** `airlock install-service` **unloads the v1 LaunchAgent before binding** so the v2 daemon takes the port cleanly. If the daemon hits `EADDRINUSE` on startup, it **probes the occupant**: it sends an MCP `initialize` and, if it gets a **v1-shaped** response, prints the exact fix (the command to unload the old LaunchAgent / stop the old daemon and retry) rather than a bare "address in use."
 
 **No state import.** There is **no UserDefaults → SQLite migration.** Locks and notes are *ephemeral coordination state*, not durable user data — importing half-expired locks from a previous daemon generation would be worse than starting clean. v2 takes a deliberate clean cut.
 
-**Service management** via `agentpeek install-service`:
+**Service management** via `airlock install-service`:
 
 - **macOS:** launchd user LaunchAgent.
 - **Linux:** systemd **user** unit (`systemctl --user`).
@@ -265,19 +265,19 @@ A single Go daemon, one process, listening on `127.0.0.1:27183`.
 
 Zero language runtime to install (G4). Channels:
 
-- **Homebrew tap** — `brew install adamorad/tap/agentpeek`. **Bottle preferred** (prebuilt binary) so install is a download, not a source build.
+- **Homebrew tap** — `brew install adamorad/tap/airlock`. **Bottle preferred** (prebuilt binary) so install is a download, not a source build.
 - **GitHub Releases** — static binaries for `darwin-arm64`, `darwin-amd64`, `linux-arm64`, `linux-amd64`.
-- **`go install`** — `go install github.com/adamorad/agentpeek@latest` for the Go-toolchain crowd.
-- **curl installer** — `curl -fsSL https://agentpeek.dev/install.sh | sh` — detects OS/arch, fetches the matching release binary, installs the service.
+- **`go install`** — `go install github.com/adamorad/airlock@latest` for the Go-toolchain crowd.
+- **curl installer** — `curl -fsSL https://airlock.dev/install.sh | sh` — detects OS/arch, fetches the matching release binary, installs the service.
 
 ---
 
 ## §9 Non-goals
 
-- **Not a memory layer.** Recall, embeddings, and long-term agent memory belong to mem0/engram — AgentPeek holds *live coordination state* (who has the lock right now), not history.
-- **Not multi-machine.** Single host only. Distributed coordination across machines is Redis/etcd territory and brings a consensus problem AgentPeek deliberately refuses.
-- **Not an orchestrator.** AgentPeek **coordinates, it never spawns.** It arbitrates agents that already exist; it does not start, schedule, or supervise them. (This is why tasks are descoped to v2.1 and kept minimal.)
-- **Not an A2A implementation.** It sits **below** A2A: A2A is *how agents talk*, AgentPeek is *the arbiter they share*. Implementing A2A would conflate the messaging standard with the coordination substrate.
+- **Not a memory layer.** Recall, embeddings, and long-term agent memory belong to mem0/engram — Airlock holds *live coordination state* (who has the lock right now), not history.
+- **Not multi-machine.** Single host only. Distributed coordination across machines is Redis/etcd territory and brings a consensus problem Airlock deliberately refuses.
+- **Not an orchestrator.** Airlock **coordinates, it never spawns.** It arbitrates agents that already exist; it does not start, schedule, or supervise them. (This is why tasks are descoped to v2.1 and kept minimal.)
+- **Not an A2A implementation.** It sits **below** A2A: A2A is *how agents talk*, Airlock is *the arbiter they share*. Implementing A2A would conflate the messaging standard with the coordination substrate.
 - **No cloud component, ever.** No hosted control plane, no account, no telemetry-home. A local-only daemon is the entire trust model; a cloud component would break the "same machine, same user, loopback-only" security story that makes it safe.
 
 ---
@@ -315,7 +315,7 @@ Bottles must be built and uploaded per-arch; a source formula is simpler to main
 |-------|-------|
 | **Phase 1 — Core** | Locks, wake-tokens/blocking waits, atomic state (`increment_counter`, `set_note_if`), SQLite/WAL store, v1 compatibility. Ship macOS + Linux binaries. |
 | **Phase 2 — Presence + events** | `register_agent` heartbeats, presence-expiry lock release + waiter wake, generation-counted events. |
-| **Phase 3 — Observability** | `agentpeek status`, `agentpeek watch`, optional `--dashboard` at `/dashboard`. |
+| **Phase 3 — Observability** | `airlock status`, `airlock watch`, optional `--dashboard` at `/dashboard`. |
 | **Phase 4 — Tasks (v2.1)** | `push_task`/`claim_next_task`/`complete_task`/`fail_task`/`list_tasks` with presence-bound leases and auto-requeue. |
 
 **Feedback loop.** A pinned **"tear this apart"** GitHub issue inviting attacks on the design, plus a **tool-votes discussion** to let early users rank which tools to build first. If any of this is wrong for your workflow, that issue is the place to say so.

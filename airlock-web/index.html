@@ -4,17 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0a0a12" />
-    <title>AgentPeek — Stop your AI agents from stepping on each other</title>
+    <title>Airlock — Stop your AI agents from stepping on each other</title>
     <meta name="description" content="A native macOS daemon with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts." />
 
     <!-- Open Graph -->
     <meta property="og:type"        content="website" />
-    <meta property="og:title"       content="AgentPeek — Stop your AI agents from stepping on each other" />
+    <meta property="og:title"       content="Airlock — Stop your AI agents from stepping on each other" />
     <meta property="og:description" content="A native macOS daemon with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts." />
 
     <!-- Twitter / X -->
     <meta name="twitter:card"        content="summary_large_image" />
-    <meta name="twitter:title"       content="AgentPeek — Stop your AI agents from stepping on each other" />
+    <meta name="twitter:title"       content="Airlock — Stop your AI agents from stepping on each other" />
     <meta name="twitter:description" content="A native macOS daemon with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts." />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,18 +36,18 @@
         <div class="hero">
           <span class="hero-badge-row">
             <span class="hero-badge">AI Agent Coordination</span>
-            <a class="hero-gh" href="https://github.com/adamorad/agentpeek" target="_blank" rel="noopener">★ GitHub</a>
+            <a class="hero-gh" href="https://github.com/adamorad/airlock" target="_blank" rel="noopener">★ GitHub</a>
           </span>
           <h1>
             Your agents are stepping on each other.
-            <span class="hero-accent">AgentPeek fixes that.</span>
+            <span class="hero-accent">Airlock fixes that.</span>
           </h1>
           <p class="tagline">A native macOS daemon with an MCP server. AI agents lock files, serialize installs, and share state — without conflicts.</p>
         </div>
 
         <!-- Install command -->
         <div class="install-cmd-wrap">
-          <code id="hero-install-cmd">brew install adamorad/tap/agentpeek</code>
+          <code id="hero-install-cmd">brew install adamorad/tap/airlock</code>
           <button class="copy-btn" data-copy="hero-install-cmd" aria-label="Copy install command">Copy</button>
         </div>
 
@@ -111,8 +111,8 @@
 
         <div class="fold4-header">
           <span class="fold4-label">The Landscape</span>
-          <h2 class="fold4-headline">Other tools store memory.<br><span class="fold4-headline-accent">AgentPeek prevents conflicts.</span></h2>
-          <p class="fold4-sub">Whole categories of tools touch this space — session-scoped MCP servers, memory layers, DIY locks. They answer "what happened." AgentPeek answers "what's happening right now."</p>
+          <h2 class="fold4-headline">Other tools store memory.<br><span class="fold4-headline-accent">Airlock prevents conflicts.</span></h2>
+          <p class="fold4-sub">Whole categories of tools touch this space — session-scoped MCP servers, memory layers, DIY locks. They answer "what happened." Airlock answers "what's happening right now."</p>
         </div>
 
         <div class="gh-compare-grid">
@@ -162,11 +162,11 @@
             </ul>
           </div>
 
-          <!-- AgentPeek (featured) -->
+          <!-- Airlock (featured) -->
           <div class="gh-card gh-card--featured">
             <div class="compare-card-badge">This one</div>
             <div class="gh-card-header">
-              <span class="gh-card-name">AgentPeek</span>
+              <span class="gh-card-name">Airlock</span>
               <span class="gh-card-new">new</span>
             </div>
             <p class="gh-card-desc">Native macOS daemon that gives every agent a shared coordination layer — named locks with TTL, shared notes, no cloud.</p>
@@ -182,7 +182,7 @@
 
         <div class="compare-insight">
           <span class="compare-insight-dot"></span>
-          <p>Session-scoped servers die with the session that spawned them. AgentPeek is a daemon — it outlives every session and arbitrates between all of them.</p>
+          <p>Session-scoped servers die with the session that spawned them. Airlock is a daemon — it outlives every session and arbitrates between all of them.</p>
         </div>
 
       </div>
@@ -197,7 +197,7 @@
       <div class="fold3-inner">
 
         <div class="fold3-header">
-          <span class="fold3-label">Why AgentPeek</span>
+          <span class="fold3-label">Why Airlock</span>
           <h2 class="fold3-headline">Three approaches.<br><span class="fold3-headline-accent">One that actually works.</span></h2>
           <p class="fold3-sub">How do your agents coordinate shared resources when they all run at once?</p>
         </div>
@@ -270,12 +270,12 @@
             </ul>
           </div>
 
-          <!-- AgentPeek MCP (featured) -->
+          <!-- Airlock MCP (featured) -->
           <div class="compare-card compare-card--featured">
             <div class="compare-card-badge">Recommended</div>
             <div class="compare-card-icon compare-card-icon--violet">🔒</div>
-            <div class="compare-card-title">AgentPeek MCP</div>
-            <div class="compare-card-subtitle">agentpeek · shared daemon</div>
+            <div class="compare-card-title">Airlock MCP</div>
+            <div class="compare-card-subtitle">airlock · shared daemon</div>
             <ul class="compare-rows">
               <li class="compare-row compare-row--yes">
                 <span class="compare-row-dot"></span>
@@ -308,7 +308,7 @@
 
         <div class="compare-insight">
           <span class="compare-insight-dot"></span>
-          <p>Shell scripts and skills give <strong>one agent</strong> visibility for one moment. AgentPeek gives <strong>every agent</strong> a shared coordination layer — Agent A locks <code>npm-install</code>, Agent B sees it's held and backs off. No conflicts. No manual work.</p>
+          <p>Shell scripts and skills give <strong>one agent</strong> visibility for one moment. Airlock gives <strong>every agent</strong> a shared coordination layer — Agent A locks <code>npm-install</code>, Agent B sees it's held and backs off. No conflicts. No manual work.</p>
         </div>
 
       </div>
@@ -363,7 +363,7 @@
             </div>
             <p class="step-desc">Installs the binary and places the LaunchAgent plist on your system.</p>
             <div class="config-row">
-              <code id="step1-cmd">brew install adamorad/tap/agentpeek</code>
+              <code id="step1-cmd">brew install adamorad/tap/airlock</code>
               <button class="copy-btn" data-copy="step1-cmd" aria-label="Copy install command">Copy</button>
             </div>
           </div>
@@ -374,9 +374,9 @@
               <div class="step-num" aria-hidden="true">2</div>
               <p class="step-title">Load daemon</p>
             </div>
-            <p class="step-desc">Register with launchd so AgentPeek starts automatically at login.</p>
+            <p class="step-desc">Register with launchd so Airlock starts automatically at login.</p>
             <div class="config-row">
-              <code id="step2-cmd">cp $(brew --prefix)/share/agentpeek/com.agentpeek.daemon.plist ~/Library/LaunchAgents/ &amp;&amp; launchctl load ~/Library/LaunchAgents/com.agentpeek.daemon.plist</code>
+              <code id="step2-cmd">cp $(brew --prefix)/share/airlock/com.airlock.daemon.plist ~/Library/LaunchAgents/ &amp;&amp; launchctl load ~/Library/LaunchAgents/com.airlock.daemon.plist</code>
               <button class="copy-btn" data-copy="step2-cmd" aria-label="Copy launchd command">Copy</button>
             </div>
           </div>
@@ -389,7 +389,7 @@
             </div>
             <p class="step-desc">Add to <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:4px">~/.claude/mcp_servers.json</code></p>
             <div class="config-row">
-              <pre id="step3-cmd">{"agentpeek": {"transport": "http", "url": "http://127.0.0.1:27183"}}</pre>
+              <pre id="step3-cmd">{"airlock": {"transport": "http", "url": "http://127.0.0.1:27183"}}</pre>
               <button class="copy-btn" data-copy="step3-cmd" aria-label="Copy MCP config JSON">Copy</button>
             </div>
           </div>
@@ -397,7 +397,7 @@
         </div><!-- /setup-steps -->
 
         <div class="roadmap-teaser">
-          v2 in design: blocking waits · atomic counters · Linux — <a href="https://github.com/adamorad/agentpeek/blob/main/docs/ROADMAP-v2.md" target="_blank" rel="noopener">read the roadmap →</a>
+          v2 in design: blocking waits · atomic counters · Linux — <a href="https://github.com/adamorad/airlock/blob/main/docs/ROADMAP-v2.md" target="_blank" rel="noopener">read the roadmap →</a>
         </div>
 
       </div>

@@ -5,7 +5,7 @@ final class MCPServer {
     private var listener: NWListener?
     private let tools: MCPTools
     private let port: UInt16
-    private let queue = DispatchQueue(label: "com.agentpeek.mcp", qos: .userInitiated)
+    private let queue = DispatchQueue(label: "com.airlock.mcp", qos: .userInitiated)
 
     init(tools: MCPTools, port: UInt16 = 27183) {
         self.tools = tools
@@ -24,9 +24,9 @@ final class MCPServer {
         listener.stateUpdateHandler = { [weak self] state in
             switch state {
             case .ready:
-                print("[AgentPeek] MCP server listening on 127.0.0.1:\(self?.port ?? 0)")
+                print("[Airlock] MCP server listening on 127.0.0.1:\(self?.port ?? 0)")
             case .failed(let error):
-                print("[AgentPeek] MCP server failed: \(error)")
+                print("[Airlock] MCP server failed: \(error)")
                 self?.listener?.cancel()
                 self?.listener = nil
             default:

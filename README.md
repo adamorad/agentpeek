@@ -1,15 +1,15 @@
-# AgentPeek
+# Airlock
 
 **Run five agents on one repo without them stomping on each other.**
 
 Named resource locks and a shared scratchpad for AI agents — exposed over a local HTTP MCP server that's always running, so any session, terminal, or CI job can coordinate with any other.
 
-![CI](https://github.com/adamorad/agentpeek/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/adamorad/airlock/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey)
 ![MCP](https://img.shields.io/badge/MCP-compatible-7C3AED)
 
-![AgentPeek demo](docs/assets/demo.gif)
+![Airlock demo](docs/assets/demo.gif)
 
 *Two agents reach for the same `npm-install` lock — one wins, the other is told who holds it, and it acquires the instant the first releases.*
 
@@ -74,17 +74,17 @@ That's the whole model: one shared, always-on arbiter; agents ask before they ac
 ### 1. Install via Homebrew
 
 ```bash
-brew install adamorad/tap/agentpeek
+brew install adamorad/tap/airlock
 ```
 
 ### 2. Load the LaunchAgent
 
 ```bash
-cp $(brew --prefix)/share/agentpeek/com.agentpeek.daemon.plist ~/Library/LaunchAgents/
-launchctl load ~/Library/LaunchAgents/com.agentpeek.daemon.plist
+cp $(brew --prefix)/share/airlock/com.airlock.daemon.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.airlock.daemon.plist
 ```
 
-AgentPeek now starts automatically on login and restarts if it crashes.
+Airlock now starts automatically on login and restarts if it crashes.
 
 ### 3. Verify
 
@@ -93,7 +93,7 @@ curl -s -X POST http://127.0.0.1:27183/ \
   -H "Content-Type: application/json" \
   -H "Host: 127.0.0.1:27183" \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}'
-# → {"result":{"serverInfo":{"name":"agentpeek","version":"1.0.0"},...}}
+# → {"result":{"serverInfo":{"name":"airlock","version":"1.0.0"},...}}
 ```
 
 ### 4. Configure your agent
@@ -101,7 +101,7 @@ curl -s -X POST http://127.0.0.1:27183/ \
 **Claude Code** — one command:
 
 ```bash
-claude mcp add --transport http agentpeek http://localhost:27183
+claude mcp add --transport http airlock http://localhost:27183
 ```
 
 **Cursor / Windsurf / any MCP client** — add this to your MCP config:
@@ -109,7 +109,7 @@ claude mcp add --transport http agentpeek http://localhost:27183
 ```json
 {
   "mcpServers": {
-    "agentpeek": {
+    "airlock": {
       "type": "http",
       "url": "http://127.0.0.1:27183"
     }
@@ -121,12 +121,12 @@ claude mcp add --transport http agentpeek http://localhost:27183
 <summary>Build from source</summary>
 
 ```bash
-git clone https://github.com/adamorad/agentpeek.git
-cd agentpeek
+git clone https://github.com/adamorad/airlock.git
+cd airlock
 swift build -c release
-sudo cp .build/release/agentpeek /usr/local/bin/agentpeek
-cp com.agentpeek.daemon.plist ~/Library/LaunchAgents/
-launchctl load ~/Library/LaunchAgents/com.agentpeek.daemon.plist
+sudo cp .build/release/airlock /usr/local/bin/airlock
+cp com.airlock.daemon.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.airlock.daemon.plist
 ```
 
 </details>
@@ -139,7 +139,7 @@ There's no shared state. No handoff. No way for one agent to know what another i
 
 ## How it works
 
-AgentPeek is a native Swift binary that runs as a macOS LaunchAgent — always on, surviving IDE and terminal restarts. It listens on `127.0.0.1:27183` and speaks MCP over HTTP. Any agent that has it configured can acquire locks and read/write notes. Locks are TTL-based, so they auto-expire if an agent crashes.
+Airlock is a native Swift binary that runs as a macOS LaunchAgent — always on, surviving IDE and terminal restarts. It listens on `127.0.0.1:27183` and speaks MCP over HTTP. Any agent that has it configured can acquire locks and read/write notes. Locks are TTL-based, so they auto-expire if an agent crashes.
 
 No Node.js. No Python. No database. One binary, zero dependencies.
 
@@ -174,7 +174,7 @@ Use consistent names so agents understand each other:
 
 ## How it compares
 
-How AgentPeek (v1, this repo) sits against adjacent tools, **as of June 2026**. Distilled from the fuller landscape in the [v2 roadmap, §3](docs/ROADMAP-v2.md).
+How Airlock (v1, this repo) sits against adjacent tools, **as of June 2026**. Distilled from the fuller landscape in the [v2 roadmap, §3](docs/ROADMAP-v2.md).
 
 | Tool | Always-on daemon | Cross-session locks | TTL auto-expiry | Zero deps | MCP-native |
 |------|:-:|:-:|:-:|:-:|:-:|
@@ -182,9 +182,9 @@ How AgentPeek (v1, this repo) sits against adjacent tools, **as of June 2026**. 
 | [Swarm Tools](https://swarmtools.ai) (file reservations + agent mail, tied to its orchestrator) | ❌ | partial | ❓ | ❌ | ❌ |
 | memory layers — [mem0](https://github.com/mem0ai/mem0) / engram (recall, not real-time coordination) | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Redis / `flock` lockfiles (capable, but real setup or no TTL + no MCP surface) | partial | ✅ | ❌ | ❌ | ❌ |
-| **AgentPeek** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Airlock** | ✅ | ✅ | ✅ | ✅ | ✅ |
 
-The unoccupied corner: an *always-on*, *zero-dependency*, *MCP-native* coordinator that survives every session. Memory layers remember the past; AgentPeek arbitrates the present. Redis has the semantics but no MCP surface and a real install.
+The unoccupied corner: an *always-on*, *zero-dependency*, *MCP-native* coordinator that survives every session. Memory layers remember the past; Airlock arbitrates the present. Redis has the semantics but no MCP surface and a real install.
 
 ## Recipes
 
@@ -253,28 +253,28 @@ v1 (this repo) is shipped and supported. v2 is the next-generation coordination 
 - **Events.** `signal_event` / `wait_for_event` (generation-counted, missed-signal-safe) for handoffs without polling.
 - **Linux.** A Go rewrite with a pure-Go SQLite store ships `linux-amd64` / `linux-arm64` binaries alongside macOS.
 
-Full design and rationale: [docs/ROADMAP-v2.md](docs/ROADMAP-v2.md). If the roadmap is wrong for your workflow, [open an issue](https://github.com/adamorad/agentpeek/issues) — there's a pinned "tear this apart" thread for exactly that.
+Full design and rationale: [docs/ROADMAP-v2.md](docs/ROADMAP-v2.md). If the roadmap is wrong for your workflow, [open an issue](https://github.com/adamorad/airlock/issues) — there's a pinned "tear this apart" thread for exactly that.
 
 ## Uninstall
 
 ```bash
 # 1. Stop and unload the LaunchAgent
-launchctl unload ~/Library/LaunchAgents/com.agentpeek.daemon.plist
+launchctl unload ~/Library/LaunchAgents/com.airlock.daemon.plist
 
 # 2. Remove the plist
-rm ~/Library/LaunchAgents/com.agentpeek.daemon.plist
+rm ~/Library/LaunchAgents/com.airlock.daemon.plist
 
 # 3. Remove the binary
-brew uninstall agentpeek          # if installed via the tap: brew uninstall adamorad/tap/agentpeek
+brew uninstall airlock          # if installed via the tap: brew uninstall adamorad/tap/airlock
 ```
 
 ## FAQ
 
-**Why port 27183?** PortPeek already uses `27182` (the first digits of *e*, Euler's number). AgentPeek takes the next port, `27183`, so the two daemons coexist on one machine without colliding.
+**Why port 27183?** PortPeek already uses `27182` (the first digits of *e*, Euler's number). Airlock takes the next port, `27183`, so the two daemons coexist on one machine without colliding.
 
-**What's the security model?** AgentPeek binds to the loopback interface (`127.0.0.1`) only, validates the `Host` header, and rejects any request carrying an `Origin` header (browsers can't reach it — a DNS-rebinding defence). The deliberate, documented caveat: **any process running as the same local user can call the API** — the daemon coordinates cooperating agents, it doesn't sandbox them. Note content is untrusted cross-agent input; consuming agents must treat it as data, never instructions. Full threat model: [SECURITY.md](SECURITY.md).
+**What's the security model?** Airlock binds to the loopback interface (`127.0.0.1`) only, validates the `Host` header, and rejects any request carrying an `Origin` header (browsers can't reach it — a DNS-rebinding defence). The deliberate, documented caveat: **any process running as the same local user can call the API** — the daemon coordinates cooperating agents, it doesn't sandbox them. Note content is untrusted cross-agent input; consuming agents must treat it as data, never instructions. Full threat model: [SECURITY.md](SECURITY.md).
 
-**How does it relate to PortPeek?** [PortPeek](https://adamorad.github.io/portpeek) solves *port* conflicts for AI agents (who's bound to which port). AgentPeek solves the broader *coordination* problem (who's doing which task). Same lineage, adjacent ports (`27182` / `27183`), designed to run side by side.
+**How does it relate to PortPeek?** [PortPeek](https://adamorad.github.io/portpeek) solves *port* conflicts for AI agents (who's bound to which port). Airlock solves the broader *coordination* problem (who's doing which task). Same lineage, adjacent ports (`27182` / `27183`), designed to run side by side.
 
 ## Contributing
 

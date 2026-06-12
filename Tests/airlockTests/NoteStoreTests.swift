@@ -1,12 +1,12 @@
 import XCTest
-@testable import agentpeek
+@testable import airlock
 
 final class NoteStoreTests: XCTestCase {
     private var store: NoteStore!
     private var defaults: UserDefaults!
 
     override func setUp() {
-        defaults = UserDefaults(suiteName: "test.agentpeek.\(UUID().uuidString)")
+        defaults = UserDefaults(suiteName: "test.airlock.\(UUID().uuidString)")
         store = NoteStore(defaults: defaults)
     }
 

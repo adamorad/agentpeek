@@ -3,16 +3,16 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.agentpeek.daemon</string>
+    <string>com.airlock.daemon</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/local/bin/agentpeek</string>
+        <string>/usr/local/bin/airlock</string>
     </array>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
     <true/>
     <key>StandardErrorPath</key>
-    <string>/tmp/agentpeek.log</string>
+    <string>/tmp/airlock.log</string>
 </dict>
 </plist>

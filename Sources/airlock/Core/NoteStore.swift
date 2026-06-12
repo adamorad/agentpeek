@@ -11,9 +11,9 @@ struct Note: Codable {
 }
 
 final class NoteStore {
-    private let queue = DispatchQueue(label: "com.agentpeek.notes")
+    private let queue = DispatchQueue(label: "com.airlock.notes")
     private var notes: [String: Note] = [:]
-    private let defaultsKey = "agentpeek.notes"
+    private let defaultsKey = "airlock.notes"
     private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {

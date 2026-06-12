@@ -2,7 +2,7 @@
 
 ## Threat model
 
-agentpeek is a coordination daemon for AI agents running on the **same machine, same user**. It binds an HTTP MCP server to the loopback interface (`127.0.0.1:27183`) only, and rejects requests with an unexpected `Host` header, any `Origin` header (browsers cannot call it), or a non-`application/json` Content-Type on POST.
+airlock is a coordination daemon for AI agents running on the **same machine, same user**. It binds an HTTP MCP server to the loopback interface (`127.0.0.1:27183`) only, and rejects requests with an unexpected `Host` header, any `Origin` header (browsers cannot call it), or a non-`application/json` Content-Type on POST.
 
 ### In scope (please report)
 

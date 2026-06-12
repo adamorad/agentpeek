@@ -1,5 +1,5 @@
 {
-  "name": "agentpeek-web",
+  "name": "airlock-web",
   "private": true,
   "scripts": {
     "dev": "vite",

@@ -2,10 +2,10 @@
 import PackageDescription
 
 let package = Package(
-    name: "agentpeek",
+    name: "airlock",
     platforms: [.macOS(.v13)],
     targets: [
-        .executableTarget(name: "agentpeek", path: "Sources/agentpeek"),
-        .testTarget(name: "agentpeekTests", dependencies: ["agentpeek"], path: "Tests/agentpeekTests")
+        .executableTarget(name: "airlock", path: "Sources/airlock"),
+        .testTarget(name: "airlockTests", dependencies: ["airlock"], path: "Tests/airlockTests")
     ]
 )

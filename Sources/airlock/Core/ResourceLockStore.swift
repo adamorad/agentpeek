@@ -16,9 +16,9 @@ struct ResourceLock: Codable {
 }
 
 final class ResourceLockStore {
-    private let queue = DispatchQueue(label: "com.agentpeek.locks")
+    private let queue = DispatchQueue(label: "com.airlock.locks")
     private var locks: [String: ResourceLock] = [:]
-    private let defaultsKey = "agentpeek.locks"
+    private let defaultsKey = "airlock.locks"
     private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {

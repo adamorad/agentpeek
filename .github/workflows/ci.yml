@@ -14,7 +14,7 @@ jobs:
       - name: Integration smoke
         run: |
           trap 'kill %1 2>/dev/null || true' EXIT
-          AGENTPEEK_DEFAULTS_SUITE="ci.agentpeek.$RANDOM" .build/release/agentpeek &
+          AIRLOCK_DEFAULTS_SUITE="ci.airlock.$RANDOM" .build/release/airlock &
           for i in $(seq 1 30); do
             curl -s -o /dev/null http://127.0.0.1:27183/ -X POST -H 'Content-Type: application/json' -d '{}' && break
             sleep 0.5
@@ -22,7 +22,7 @@ jobs:
           nc -z 127.0.0.1 27183 || { echo 'daemon never bound'; exit 1; }
           call() { curl -s -X POST http://127.0.0.1:27183/ -H "Content-Type: application/json" -d "$1"; }
           code() { curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:27183/ "$@"; }
-          call '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | grep -q '"agentpeek"'
+          call '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | grep -q '"airlock"'
           call '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' | grep -q 'lock_resource'
           # Tool results are JSON-encoded inside MCP content text, so inner quotes are escaped (\").
           call '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"lock_resource","arguments":{"name":"ci","agent_id":"A","ttl_minutes":1}}}' | grep -qF '\"locked\":true'

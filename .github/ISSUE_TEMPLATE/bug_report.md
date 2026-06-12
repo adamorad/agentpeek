@@ -1,12 +1,12 @@
 ---
 name: Bug report
-about: Report a problem with agentpeek
+about: Report a problem with airlock
 title: ''
 labels: bug
 assignees: ''
 ---
 
-**agentpeek version**
+**airlock version**
 <!-- e.g. 1.0.0 -->
 
 **macOS version**

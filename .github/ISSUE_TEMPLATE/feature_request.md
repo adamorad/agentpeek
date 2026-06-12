@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest a new tool or behavior for agentpeek
+about: Suggest a new tool or behavior for airlock
 title: ''
 labels: enhancement
 assignees: ''
