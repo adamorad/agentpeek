@@ -1,5 +1,7 @@
 # Airlock v2 — The Coordination Layer for AI Agents
 
+> **Status (2026-06-12): v2.0.0 shipped.** The core (locks with blocking waits, atomic state, presence, events) and the task queue are implemented in Go and cross-platform. This document is the original design spec.
+
 > Status: public roadmap. v2 is design-only right now — this document is the roadmap and the design rationale. v1 (this repo) is shipped and supported; v2 is the next-generation design described below.
 > Last updated: 2026-06-12.
 

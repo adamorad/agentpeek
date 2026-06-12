@@ -3,7 +3,7 @@ package version
 
 const (
 	// Number is the semantic version of the airlock binary.
-	Number = "2.0.0-dev"
+	Number = "2.0.0"
 	// Name is the binary/product name used in CLI output.
 	Name = "airlock"
 )
