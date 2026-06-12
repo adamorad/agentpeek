@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/adamorad/airlock/internal/store"
+	"github.com/adamorad/airlock/v2/internal/store"
 )
 
 // newTestHandler opens a temp-DB store, builds the managers, starts their

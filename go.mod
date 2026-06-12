@@ -1,4 +1,4 @@
-module github.com/adamorad/airlock
+module github.com/adamorad/airlock/v2
 
 go 1.23.0
 

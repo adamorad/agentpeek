@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/adamorad/airlock/internal/store"
+	"github.com/adamorad/airlock/v2/internal/store"
 )
 
 // openTestStore opens a fresh store backed by a temp-dir SQLite file.

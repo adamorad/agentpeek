@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/adamorad/airlock/internal/store"
-	"github.com/adamorad/airlock/internal/version"
+	"github.com/adamorad/airlock/v2/internal/store"
+	"github.com/adamorad/airlock/v2/internal/version"
 )
 
 // protocolVersion is the MCP protocol revision airlock implements. It is echoed
