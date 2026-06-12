@@ -44,7 +44,7 @@
 
         <!-- Install command -->
         <div class="install-cmd-wrap">
-          <code id="hero-install-cmd">brew install agentpeek</code>
+          <code id="hero-install-cmd">brew install adamorad/tap/agentpeek</code>
           <button class="copy-btn" data-copy="hero-install-cmd" aria-label="Copy install command">Copy</button>
         </div>
 
@@ -143,12 +143,12 @@
           <div class="step-card">
             <div class="step-card-header">
               <div class="step-num" aria-hidden="true">1</div>
-              <p class="step-title">Build &amp; install</p>
+              <p class="step-title">Install via Homebrew</p>
             </div>
-            <p class="step-desc">Compile from source and place the binary on your PATH.</p>
+            <p class="step-desc">Installs the binary and places the LaunchAgent plist on your system.</p>
             <div class="config-row">
-              <code id="step1-cmd">swift build -c release &amp;&amp; sudo cp .build/release/agentpeek /usr/local/bin/</code>
-              <button class="copy-btn" data-copy="step1-cmd" aria-label="Copy build command">Copy</button>
+              <code id="step1-cmd">brew install adamorad/tap/agentpeek</code>
+              <button class="copy-btn" data-copy="step1-cmd" aria-label="Copy install command">Copy</button>
             </div>
           </div>
 
@@ -160,7 +160,7 @@
             </div>
             <p class="step-desc">Register with launchd so AgentPeek starts automatically at login.</p>
             <div class="config-row">
-              <code id="step2-cmd">cp com.agentpeek.daemon.plist ~/Library/LaunchAgents/ &amp;&amp; launchctl load ~/Library/LaunchAgents/com.agentpeek.daemon.plist</code>
+              <code id="step2-cmd">cp $(brew --prefix)/share/agentpeek/com.agentpeek.daemon.plist ~/Library/LaunchAgents/ &amp;&amp; launchctl load ~/Library/LaunchAgents/com.agentpeek.daemon.plist</code>
               <button class="copy-btn" data-copy="step2-cmd" aria-label="Copy launchd command">Copy</button>
             </div>
           </div>

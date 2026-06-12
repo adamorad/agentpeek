@@ -28,19 +28,16 @@ No Node.js. No Python. No database. One binary, zero dependencies.
 
 ## Install
 
-### 1. Build and install
+### 1. Install via Homebrew
 
 ```bash
-git clone https://github.com/adamorad/agentpeek.git
-cd agentpeek
-swift build -c release
-sudo cp .build/release/agentpeek /usr/local/bin/agentpeek
+brew install adamorad/tap/agentpeek
 ```
 
 ### 2. Load the LaunchAgent
 
 ```bash
-cp com.agentpeek.daemon.plist ~/Library/LaunchAgents/
+cp $(brew --prefix)/share/agentpeek/com.agentpeek.daemon.plist ~/Library/LaunchAgents/
 launchctl load ~/Library/LaunchAgents/com.agentpeek.daemon.plist
 ```
 
@@ -72,6 +69,20 @@ claude mcp add --transport http agentpeek http://localhost:27183
   }
 }
 ```
+
+<details>
+<summary>Build from source</summary>
+
+```bash
+git clone https://github.com/adamorad/agentpeek.git
+cd agentpeek
+swift build -c release
+sudo cp .build/release/agentpeek /usr/local/bin/agentpeek
+cp com.agentpeek.daemon.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.agentpeek.daemon.plist
+```
+
+</details>
 
 ## Tools
 
