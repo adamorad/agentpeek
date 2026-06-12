@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/adamorad/airlock/internal/store"
+	"github.com/adamorad/airlock/v2/internal/store"
 )
 
 // newE2EHandler builds a real ToolHandler over a temp store for the HTTP

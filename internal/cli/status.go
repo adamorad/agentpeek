@@ -12,7 +12,7 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/adamorad/airlock/internal/store"
+	"github.com/adamorad/airlock/v2/internal/store"
 )
 
 // defaultAddr mirrors the loopback address the daemon listens on. It is only

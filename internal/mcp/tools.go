@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/adamorad/airlock/internal/store"
+	"github.com/adamorad/airlock/v2/internal/store"
 )
 
 // defaultLockTTLSeconds is the lock TTL applied when a caller supplies neither

@@ -49,7 +49,7 @@ State lives in **SQLite (WAL mode)** at `~/.airlock/state.db` — transactional,
 ### (a) `go install`
 
 ```bash
-go install github.com/adamorad/airlock@latest   # builds the `airlock` binary
+go install github.com/adamorad/airlock/v2@latest   # builds the `airlock` binary
 airlock install-service                          # launchd (macOS) / systemd user unit (Linux)
 ```
 

@@ -19,11 +19,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/adamorad/airlock/internal/cli"
-	"github.com/adamorad/airlock/internal/mcp"
-	"github.com/adamorad/airlock/internal/service"
-	"github.com/adamorad/airlock/internal/store"
-	"github.com/adamorad/airlock/internal/version"
+	"github.com/adamorad/airlock/v2/internal/cli"
+	"github.com/adamorad/airlock/v2/internal/mcp"
+	"github.com/adamorad/airlock/v2/internal/service"
+	"github.com/adamorad/airlock/v2/internal/store"
+	"github.com/adamorad/airlock/v2/internal/version"
 )
 
 // defaultAddr is the loopback address the daemon listens on.
