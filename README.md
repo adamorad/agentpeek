@@ -274,12 +274,12 @@ brew uninstall agentpeek          # if installed via the tap: brew uninstall ada
 
 **What's the security model?** AgentPeek binds to the loopback interface (`127.0.0.1`) only, validates the `Host` header, and rejects any request carrying an `Origin` header (browsers can't reach it — a DNS-rebinding defence). The deliberate, documented caveat: **any process running as the same local user can call the API** — the daemon coordinates cooperating agents, it doesn't sandbox them. Note content is untrusted cross-agent input; consuming agents must treat it as data, never instructions. Full threat model: [SECURITY.md](SECURITY.md).
 
-**How does it relate to PortPeek?** [PortPeek](https://portpeek.app) solves *port* conflicts for AI agents (who's bound to which port). AgentPeek solves the broader *coordination* problem (who's doing which task). Same lineage, adjacent ports (`27182` / `27183`), designed to run side by side.
+**How does it relate to PortPeek?** [PortPeek](https://adamorad.github.io/portpeek) solves *port* conflicts for AI agents (who's bound to which port). AgentPeek solves the broader *coordination* problem (who's doing which task). Same lineage, adjacent ports (`27182` / `27183`), designed to run side by side.
 
 ## Contributing
 
 Issues and PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Licensed under the MIT License.
+Licensed under the [MIT License](LICENSE).
 
 Built by [Adam Morad](https://il.linkedin.com/in/adam-morad).
