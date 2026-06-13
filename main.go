@@ -88,7 +88,6 @@ func runDaemon(args []string) int {
 		fmt.Fprintf(os.Stderr, "%s: open db: %v\n", version.Name, err)
 		return 1
 	}
-	defer s.Close()
 
 	// Assemble the managers. Presence depends on the lock manager so it can
 	// release a dead agent's locks on expiry.
@@ -99,11 +98,26 @@ func runDaemon(args []string) int {
 
 	// One ctx drives both the background reapers and the HTTP server shutdown.
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer cancel()
 
 	lm.Start(ctx)
 	pm.Start(ctx)
 	tm.Start(ctx)
+
+	// Shutdown order is deterministic: when this function returns (ctx cancelled
+	// by signal, or an early error path), first cancel ctx so the reapers begin
+	// exiting, then join every reaper goroutine, then close the store. Joining
+	// before Close guarantees no reaper is mid-query when the DB connection is
+	// torn down. The reapers exit within one tick (~250ms–1s) of cancellation, so
+	// this does not delay a normal shutdown noticeably. On an early error path
+	// (e.g. port in use) ctx may not have been cancelled by a signal, so we cancel
+	// it here explicitly to avoid blocking forever on Wait.
+	defer func() {
+		cancel()
+		lm.Wait()
+		pm.Wait()
+		tm.Wait()
+		s.Close()
+	}()
 
 	// Auth posture: on darwin we rely on loopback-only binding plus Host/Origin
 	// checks (single-user dev box). On other OSes (Linux/multi-user) we require a

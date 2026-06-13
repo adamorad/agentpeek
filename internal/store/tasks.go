@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"sync"
 	"time"
 )
 
@@ -51,6 +52,8 @@ type Task struct {
 // at-least-once delivery — a consumer that dies mid-task does not strand it.
 type TaskManager struct {
 	s *Store
+
+	wg sync.WaitGroup // tracks the reaper goroutine so Wait can join it
 }
 
 // NewTaskManager constructs a TaskManager over the given store. Call Start to
@@ -62,8 +65,14 @@ func NewTaskManager(s *Store) *TaskManager {
 // Start launches the requeue reaper goroutine, which runs until ctx is
 // cancelled.
 func (t *TaskManager) Start(ctx context.Context) {
-	go t.reapLoop(ctx)
+	t.wg.Add(1)
+	go func() { defer t.wg.Done(); t.reapLoop(ctx) }()
 }
+
+// Wait blocks until the reaper goroutine has returned (after ctx is cancelled).
+// Call it during shutdown before closing the store so no reaper is mid-query
+// when the DB closes.
+func (t *TaskManager) Wait() { t.wg.Wait() }
 
 func (t *TaskManager) reapLoop(ctx context.Context) {
 	tk := time.NewTicker(taskReaperInterval)

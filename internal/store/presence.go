@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"database/sql"
+	"sync"
 	"time"
 )
 
@@ -25,6 +26,8 @@ type AgentInfo struct {
 type PresenceManager struct {
 	s     *Store
 	locks *LockManager
+
+	wg sync.WaitGroup // tracks the reaper goroutine so Wait can join it
 }
 
 // NewPresenceManager constructs a PresenceManager over the given store and lock
@@ -35,8 +38,14 @@ func NewPresenceManager(s *Store, locks *LockManager) *PresenceManager {
 
 // Start launches the expiry reaper goroutine, which runs until ctx is cancelled.
 func (p *PresenceManager) Start(ctx context.Context) {
-	go p.reapLoop(ctx)
+	p.wg.Add(1)
+	go func() { defer p.wg.Done(); p.reapLoop(ctx) }()
 }
+
+// Wait blocks until the reaper goroutine has returned (after ctx is cancelled).
+// Call it during shutdown before closing the store so no reaper is mid-query
+// when the DB closes.
+func (p *PresenceManager) Wait() { p.wg.Wait() }
 
 func (p *PresenceManager) reapLoop(ctx context.Context) {
 	t := time.NewTicker(presenceReaperInterval)

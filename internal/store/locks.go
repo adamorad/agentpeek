@@ -82,6 +82,8 @@ type LockManager struct {
 
 	mu     sync.Mutex            // guards queues
 	queues map[string]*lockQueue // by lock name; entries pruned when empty
+
+	wg sync.WaitGroup // tracks the reaper goroutine so Wait can join it
 }
 
 // NewLockManager constructs a LockManager over the given store. Call Start to
@@ -95,8 +97,14 @@ func NewLockManager(s *Store) *LockManager {
 
 // Start launches the reaper goroutine, which runs until ctx is cancelled.
 func (m *LockManager) Start(ctx context.Context) {
-	go m.reapLoop(ctx)
+	m.wg.Add(1)
+	go func() { defer m.wg.Done(); m.reapLoop(ctx) }()
 }
+
+// Wait blocks until the reaper goroutine has returned (after ctx is cancelled).
+// Call it during shutdown before closing the store so no reaper is mid-query
+// when the DB closes.
+func (m *LockManager) Wait() { m.wg.Wait() }
 
 func (m *LockManager) reapLoop(ctx context.Context) {
 	t := time.NewTicker(reaperInterval)
